@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Runic.C.Parser</AssemblyName>
+    <RootNamespace>Runic.C.Parser</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Runic.Token" Version="1.0.1" />
+    <PackageReference Include="Runic.Statement" Version="1.0.1" />
+  </ItemGroup>
+</Project>
