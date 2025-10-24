@@ -37,7 +37,7 @@ namespace Runic.C
                 Token? _operator;
                 Type _type;
                 public override Type? Type { get { return _type; } }
-                public LogicalAnd(Token? op, Expression left, Expression right)
+                internal LogicalAnd(Token? op, Expression left, Expression right)
                 {
                     _type = new Type.Int(op);
                     _left = left;

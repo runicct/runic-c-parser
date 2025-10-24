@@ -34,7 +34,7 @@ namespace Runic.C
             {
                 Token? _operator;
                 public Token? Operator { get { return _operator; } }
-                public Reference(Token? op)
+                internal Reference(Token? op)
                 {
                     _operator = op;
                 }
@@ -49,7 +49,7 @@ namespace Runic.C
                 public Variable Variable { get { return _variable; } }
                 Type _type;
                 public override Type? Type { get { return _type; } }
-                public VariableReference(Token? op, Variable variable) : base(op)
+                internal VariableReference(Token? op, Variable variable) : base(op)
                 {
                     _type = variable.Type.MakePointer(op);
                     _variable = variable;
@@ -67,7 +67,7 @@ namespace Runic.C
                 public Field[] Fields { get { return _fields; } }
                 Type _type;
                 public override Type? Type { get { return _type; } }
-                public MemberReference(Token? op, Variable variable, Field[] fields) : base(op)
+                internal MemberReference(Token? op, Variable variable, Field[] fields) : base(op)
                 {
                     _variable = variable;
                     _fields = fields;
@@ -104,7 +104,7 @@ namespace Runic.C
                 public Expression Index { get { return _index; } }
                 Type _type;
                 public override Type? Type { get { return _type; } }
-                public IndexingReference(Token? op, Expression target, Expression index) : base(op)
+                internal IndexingReference(Token? op, Expression target, Expression index) : base(op)
                 {
                     _target = target;
                     _index = index;

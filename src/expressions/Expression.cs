@@ -481,26 +481,30 @@ namespace Runic.C
                 }
                 return false;
             }
-            static int GetPrecendence(Operator Operator)
+            static int GetPrecendence(Operator op)
             {
-                if (Operator.Token.Value == null) { return int.MaxValue; }
+                return GetPrecendence(op.Token == null ? null : op.Token.Value, op.Flag);
+            }
+            static int GetPrecendence(string? op, OperatorFlag flags)
+            {
+                if (op == null) { return int.MaxValue; }
 
-                if ((Operator.Flag & OperatorFlag.Cast) != 0) { return 2; }
-                if ((Operator.Flag & OperatorFlag.Postfix) != 0)
+                if ((flags & OperatorFlag.Cast) != 0) { return 2; }
+                if ((flags & OperatorFlag.Postfix) != 0)
                 {
-                    if (Operator.Token.Value == "++" || Operator.Token.Value == "--")
+                    if (op == "++" || op == "--")
                     {
                         return 1;
                     }
                 }
-                if ((Operator.Flag & OperatorFlag.Unary) != 0)
+                if ((flags & OperatorFlag.Unary) != 0)
                 {
-                    if (Operator.Token.Value == "&" || Operator.Token.Value == "*")
+                    if (op == "&" || op == "*")
                     {
                         return 2;
                     }
                 }
-                return OperatorPrecedence.GetPrecendence(Operator.Token.Value);
+                return OperatorPrecedence.GetPrecendence(op);
             }
             internal static Expression? ParseFunctionCall(Function Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
             {
@@ -659,7 +663,7 @@ namespace Runic.C
                         }
 
                         flag &= ~OperatorFlag.MaybeFunction;
-                        int precedence = OperatorPrecedence.GetPrecendence(token.Value);
+                        int precedence = GetPrecendence(token.Value, flag);
 
                         while ((operators.Count > 0) && GetPrecendence(operators.Peek()) < precedence && operators.Peek().Token.Value != "(")
                         {
@@ -1076,7 +1080,7 @@ namespace Runic.C
                         else if (IsOperator(token))
                         {
                             flag &= ~OperatorFlag.MaybeFunction;
-                            int precedence = OperatorPrecedence.GetPrecendence(token.Value);
+                            int precedence = GetPrecendence(token.Value, flag);
 
                             while ((operators.Count > 0) && GetPrecendence(operators.Peek()) < precedence && operators.Peek().Token.Value != "(")
                             {
@@ -1320,6 +1324,7 @@ namespace Runic.C
                                 expressions.Push(new Constant(new Token[] { token }));
                             }
                             flag |= OperatorFlag.Postfix;
+                            flag &= ~OperatorFlag.Unary;
                         }
                     }
 

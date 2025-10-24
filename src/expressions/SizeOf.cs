@@ -37,7 +37,7 @@ namespace Runic.C
                     Token _sizeofKeyword;
                     Token _leftParenthesis;
                     Token _rightParenthesis;
-                    public SizeOfExpression(Token sizeofKeyword, Token leftParenthesis, Expression Expression, Token rightParenthesis)
+                    internal SizeOfExpression(Token sizeofKeyword, Token leftParenthesis, Expression Expression, Token rightParenthesis)
                     {
                         _sizeofKeyword = sizeofKeyword;
                         _leftParenthesis = leftParenthesis;
@@ -56,7 +56,7 @@ namespace Runic.C
                     Token _sizeofKeyword;
                     Token _leftParenthesis;
                     Token _rightParenthesis;
-                    public SizeOfType(Token sizeofKeyword, Token leftParenthesis, Type type, Token rightParenthesis)
+                    internal SizeOfType(Token sizeofKeyword, Token leftParenthesis, Type type, Token rightParenthesis)
                     {
                         _sizeofKeyword = sizeofKeyword;
                         _leftParenthesis = leftParenthesis;
