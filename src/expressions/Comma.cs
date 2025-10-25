@@ -35,9 +35,9 @@ namespace Runic.C
                 Expression _right;
                 public Expression Right { get { return _right; } }
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _right.Type; } }
+                internal override Type? Type { get { return _right.Type; } }
 #else
-                public override Type Type { get { return _right.Type; } }
+                internal override Type Type { get { return _right.Type; } }
 #endif
                 Token _op;
                 public Token Operator { get { return _op; } }

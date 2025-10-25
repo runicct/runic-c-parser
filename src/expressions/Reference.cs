@@ -49,9 +49,9 @@ namespace Runic.C
                 public Variable Variable { get { return _variable; } }
                 Type _type;
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _type; } }
+                internal override Type? Type { get { return _type; } }
 #else
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
 #endif
                 internal VariableReference(Token op, Variable variable) : base(op)
                 {
@@ -71,9 +71,9 @@ namespace Runic.C
                 public Field[] Fields { get { return _fields; } }
                 Type _type;
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _type; } }
+                internal override Type? Type { get { return _type; } }
 #else
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
 #endif
                 internal MemberReference(Token op, Variable variable, Field[] fields) : base(op)
                 {
@@ -116,9 +116,9 @@ namespace Runic.C
                 public Expression Index { get { return _index; } }
                 Type _type;
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _type; } }
+                internal override Type? Type { get { return _type; } }
 #else
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
 #endif
                 internal IndexingReference(Token op, Expression target, Expression index) : base(op)
                 {

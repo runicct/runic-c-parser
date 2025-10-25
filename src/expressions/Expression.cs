@@ -1629,9 +1629,9 @@ namespace Runic.C
                 return expressions.Pop(null);
             }
 #if NET6_0_OR_GREATER
-            public virtual Type? Type { get { return null; } }
+            internal virtual Type? Type { get { return null; } }
 #else
-            public virtual Type Type { get { return null; } }
+            internal virtual Type Type { get { return null; } }
 #endif
             }
         }

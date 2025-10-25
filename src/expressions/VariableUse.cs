@@ -32,9 +32,9 @@ namespace Runic.C
             Variable _Variable;
             public Variable Variable { get { return _Variable; } }
 #if NET6_0_OR_GREATER
-            public override Type? Type { get { return _Variable.Type; } }
+            internal override Type? Type { get { return _Variable.Type; } }
 #else
-            public override Type Type { get { return _Variable.Type; } }
+            internal override Type Type { get { return _Variable.Type; } }
 #endif
             internal VariableUse(Variable Variable)
             {

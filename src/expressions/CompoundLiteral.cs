@@ -86,7 +86,7 @@ namespace Runic.C
                 Dictionary<Field, Expression> _fields;
                 public Dictionary<Field, Expression> Values { get { return _fields; } }
                 Type.StructOrUnion _type;
-                public Type.StructOrUnion Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
                 CompoundLiteralsList _literalsList;
                 internal CompoundLiteralsStruct(CompoundLiteralsList literalsList, Dictionary<Field, Expression> initialization, Type.StructOrUnion type)
                 {

@@ -31,7 +31,7 @@ namespace Runic.C
             public class Cast : Expression
             {
                 Type _type;
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
                 Expression _value;
                 public Expression Value { get { return _value; } }
                 Token _leftParenthesis;

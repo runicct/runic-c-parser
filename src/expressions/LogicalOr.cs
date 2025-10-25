@@ -38,10 +38,10 @@ namespace Runic.C
                 public Token Operator { get { return _operator; } }
 #if NET6_0_OR_GREATER
                 Type _type;
-                public override Type? Type { get { return _type; } }
+                internal override Type? Type { get { return _type; } }
 #else
                 Type _type;
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
 #endif
                 internal LogicalOr(Token op, Expression left, Expression right)
                 {

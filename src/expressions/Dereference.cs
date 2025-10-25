@@ -34,9 +34,9 @@ namespace Runic.C
                 public Expression Address { get { return _address; } }
                 Type _type;
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _type; } }
+                internal override Type? Type { get { return _type; } }
 #else
-                public override Type Type { get { return _type; } }
+                internal override Type Type { get { return _type; } }
 #endif
                 Token _operator;
                 internal Token Operator { get { return _operator; } }

@@ -35,9 +35,9 @@ namespace Runic.C
                 Token _name;
                 public Token Name { get { return _name; } }
 #if NET6_0_OR_GREATER
-                public override Type? Type { get { return _function.Type; } }
+                internal override Type? Type { get { return _function.Type; } }
 #else
-                public override Type Type { get { return _function.Type; } }
+                internal override Type Type { get { return _function.Type; } }
 #endif
                 internal FunctionReference(Token name, Function function)
                 {
