@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5B0EE6E7-769B-4EA6-A894-B2CBCDD3DA00}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Runic.C.Parser</RootNamespace>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Runic.Statement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Runic.Statement.1.0.1\lib\net48\Runic.Statement.dll</HintPath>
+    </Reference>
+    <Reference Include="Runic.Token, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Runic.Token.1.0.1\lib\net48\Runic.Token.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\Identifier.cs">
+      <Link>Identifier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\ImplicitToken.cs">
+      <Link>ImplicitToken.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Label.cs">
+      <Link>Label.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\OperatorPrecedence.cs">
+      <Link>OperatorPrecedence.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Parser.cs">
+      <Link>Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Add.cs">
+      <Link>/expressions/Add.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/And.cs">
+      <Link>/expressions/And.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Assignment.cs">
+      <Link>/expressions/Assignment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Call.cs">
+      <Link>/expressions/Call.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Cast.cs">
+      <Link>/expressions/Cast.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Comma.cs">
+      <Link>/expressions/Comma.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Comparison.cs">
+      <Link>/expressions/Comparison.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/CompoundLiteral.cs">
+      <Link>/expressions/CompoundLiteral.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Constant.cs">
+      <Link>/expressions/Constant.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Decrement.cs">
+      <Link>/expressions/Decrement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Dereference.cs">
+      <Link>/expressions/Dereference.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Div.cs">
+      <Link>/expressions/Div.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/EnumMemberUse.cs">
+      <Link>/expressions/EnumMemberUse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Expression.cs">
+      <Link>/expressions/Expression.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/FunctionReference.cs">
+      <Link>/expressions/FunctionReference.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Increment.cs">
+      <Link>/expressions/Increment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Indexing.cs">
+      <Link>/expressions/Indexing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/IndirectCall.cs">
+      <Link>/expressions/IndirectCall.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/LogicalAnd.cs">
+      <Link>/expressions/LogicalAnd.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/LogicalOr.cs">
+      <Link>/expressions/LogicalOr.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Mul.cs">
+      <Link>/expressions/Mul.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Not.cs">
+      <Link>/expressions/Not.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Nullptr.cs">
+      <Link>/expressions/Nullptr.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Or.cs">
+      <Link>/expressions/Or.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Reference.cs">
+      <Link>/expressions/Reference.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/SizeOf.cs">
+      <Link>/expressions/SizeOf.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Sub.cs">
+      <Link>/expressions/Sub.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/VariableUse.cs">
+      <Link>/expressions/VariableUse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\functions/Function.cs">
+      <Link>/functions/Function.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\functions/FunctionDeclaration.cs">
+      <Link>/functions/FunctionDeclaration.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\functions/FunctionDefinition.cs">
+      <Link>/functions/FunctionDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\functions/Intrinsic.cs">
+      <Link>/functions/Intrinsic.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Break.cs">
+      <Link>/scopes/Break.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Case.cs">
+      <Link>/scopes/Case.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Default.cs">
+      <Link>/scopes/Default.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/DoWhile.cs">
+      <Link>/scopes/DoWhile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Else.cs">
+      <Link>/scopes/Else.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/For.cs">
+      <Link>/scopes/For.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/If.cs">
+      <Link>/scopes/If.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/IScope.cs">
+      <Link>/scopes/IScope.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/RootScope.cs">
+      <Link>/scopes/RootScope.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Scope.cs">
+      <Link>/scopes/Scope.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Switch.cs">
+      <Link>/scopes/Switch.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/While.cs">
+      <Link>/scopes/While.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/Attributes.cs">
+      <Link>/statements/Attributes.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/Empty.cs">
+      <Link>/statements/Empty.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/EmptyWhile.cs">
+      <Link>/statements/EmptyWhile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/Return.cs">
+      <Link>/statements/Return.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/Typedef.cs">
+      <Link>/statements/Typedef.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/UnscopedDo.cs">
+      <Link>/statements/UnscopedDo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/UnscopedElse.cs">
+      <Link>/statements/UnscopedElse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/UnscopedFor.cs">
+      <Link>/statements/UnscopedFor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/UnscopedIf.cs">
+      <Link>/statements/UnscopedIf.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\statements/UnscopedWhile.cs">
+      <Link>/statements/UnscopedWhile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Char.cs">
+      <Link>/types/Char.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Double.cs">
+      <Link>/types/Double.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Enum.cs">
+      <Link>/types/Enum.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Field.cs">
+      <Link>/types/Field.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Float.cs">
+      <Link>/types/Float.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/FunctionPointerType.cs">
+      <Link>/types/FunctionPointerType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Int.cs">
+      <Link>/types/Int.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Long.cs">
+      <Link>/types/Long.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/LongLong.cs">
+      <Link>/types/LongLong.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Pointer.cs">
+      <Link>/types/Pointer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Short.cs">
+      <Link>/types/Short.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/SignedChar.cs">
+      <Link>/types/SignedChar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/SizeT.cs">
+      <Link>/types/SizeT.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/StaticArray.cs">
+      <Link>/types/StaticArray.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/StdInt.cs">
+      <Link>/types/StdInt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Struct.cs">
+      <Link>/types/Struct.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Type.cs">
+      <Link>/types/Type.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Unsigned.cs">
+      <Link>/types/Unsigned.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/UnsignedChar.cs">
+      <Link>/types/UnsignedChar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/UnsignedLong.cs">
+      <Link>/types/UnsignedLong.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/UnsignedLongLong.cs">
+      <Link>/types/UnsignedLongLong.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/UnsignedShort.cs">
+      <Link>/types/UnsignedShort.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/VariadicListType.cs">
+      <Link>/types/VariadicListType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/Void.cs">
+      <Link>/types/Void.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\types/WChar.cs">
+      <Link>/types/WChar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\variables/FunctionParameter.cs">
+      <Link>/variables/FunctionParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\variables/GlobalVariable.cs">
+      <Link>/variables/GlobalVariable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\variables/LocalVariable.cs">
+      <Link>/variables/LocalVariable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\variables/Variable.cs">
+      <Link>/variables/Variable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\variables/VariableDeclaration.cs">
+      <Link>/variables/VariableDeclaration.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
