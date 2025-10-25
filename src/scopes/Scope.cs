@@ -47,9 +47,9 @@ namespace Runic.C
                     return _functionDefinition;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return null; }
+                internal override IScope? GetBreakContinueScope() { return null; }
 #else
-                public override IScope GetBreakContinueScope() { return null; }
+                internal override IScope GetBreakContinueScope() { return null; }
 #endif
             }
             internal class IfScope : Scope
@@ -70,9 +70,9 @@ namespace Runic.C
                     _else = Else;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             internal class WhileScope : Scope
@@ -84,9 +84,9 @@ namespace Runic.C
                     _while = While;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             internal class SwitchScope : Scope
@@ -98,9 +98,9 @@ namespace Runic.C
                     _switch = Switch;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             internal class DoWhileScope : Scope
@@ -112,9 +112,9 @@ namespace Runic.C
                     _doWhile = DoWhile;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             internal class ForScope : Scope
@@ -126,9 +126,9 @@ namespace Runic.C
                     _for = For;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             internal class UnscopedForScope : Scope
@@ -147,9 +147,9 @@ namespace Runic.C
                     return false;
                 }
 #if NET6_0_OR_GREATER
-                public override IScope? GetBreakContinueScope() { return this; }
+                internal override IScope? GetBreakContinueScope() { return this; }
 #else
-                public override IScope GetBreakContinueScope() { return this; }
+                internal override IScope GetBreakContinueScope() { return this; }
 #endif
             }
             Parser _context;
@@ -162,12 +162,31 @@ namespace Runic.C
             }
             Dictionary<string, Type> _types = new Dictionary<string, Type>();
 #if NET6_0_OR_GREATER
-            public virtual IScope? GetBreakContinueScope()
+            internal virtual IScope? GetBreakContinueScope()
 #else
-            public virtual IScope GetBreakContinueScope()
+            internal virtual IScope GetBreakContinueScope()
 #endif
             {
-                return _parentScope.GetBreakContinueScope();
+#if NET6_0_OR_GREATER
+                Scope? parentScope = (_parentScope as Scope);
+#else
+                Scope parentScope = (_parentScope as Scope);
+#endif
+                if (parentScope != null) { return parentScope.GetBreakContinueScope(); }
+
+                IScope scope = _parentScope;
+                while (scope != null)
+                {
+#if NET6_0_OR_GREATER
+                    Scope? typedScope = (scope as Scope);
+#else
+                    Scope typedScope = (scope as Scope);
+#endif
+                    if (typedScope != null) { return typedScope.GetBreakContinueScope(); }
+                    else { scope = scope.ParentScope; }
+                }
+
+                return null;
             }
             internal void AddType(Token Name, Type Type, bool SkipRedefineError = false)
             {

@@ -30,14 +30,12 @@ namespace Runic.C
         {
 #if NET6_0_OR_GREATER
             IScope? ParentScope { get; }
-            IScope? GetBreakContinueScope();
             Type? ResolveType(string Name);
             Variable? ResolveVariable(string Name);
             Function? ResolveFunction(string Name);
             Type.Enum.Member? ResolveEnumMember(string Name);
 #else
             IScope ParentScope { get; }
-            IScope GetBreakContinueScope();
             Type ResolveType(string Name);
             Variable ResolveVariable(string Name);
             Function ResolveFunction(string Name);
