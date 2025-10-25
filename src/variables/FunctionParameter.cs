@@ -28,23 +28,21 @@ namespace Runic.C
     {
         public class FunctionParameter : Variable
         {
-            Type _type;
-            public Type Type { get { return _type; } }
-            Token? _name;
-            public Token? Name { get { return _name; } }
             ulong _index;
             public ulong Index { get { return _index; } }
+#if NET6_0_OR_GREATER
             internal FunctionParameter(Attribute[] attributes, Type Type, Token? Name, ulong index) : base(attributes, Type, Name)
+#else
+            internal FunctionParameter(Attribute[] attributes, Type Type, Token Name, ulong index) : base(attributes, Type, Name)
+#endif
             {
-                _type = Type;
-                _name = Name;
                 _index = index;
             }
 
             public override string ToString()
             {
-                if (_name == null) { return _type.ToString(); }
-                return _type.ToString() + " " + _name.ToString();
+                if (Name == null) { return Type.ToString(); }
+                return Type.ToString() + " " + Name.ToString();
             }
         }
     }

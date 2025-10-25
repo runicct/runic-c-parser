@@ -30,15 +30,24 @@ namespace Runic.C
         {
             Type _Type;
             public override Type Type { get { return _Type; } }
+#if NET6_0_OR_GREATER
             Token? _Name;
             public Token? Name { get { return _Name; } }
+#else
+            Token _Name;
+            public Token Name { get { return _Name; } }
+#endif
             Attribute[] _Attributes;
             public Attribute[] Attributes { get { return _Attributes; } }
             bool _extern = false;
             public bool Extern { get { return _extern; } }
             bool _static = false;
             public bool Static { get { return _static; } }
+#if NET6_0_OR_GREATER
             internal Variable(Attribute[] attributes, Type type, Token? name)
+#else
+            internal Variable(Attribute[] attributes, Type type, Token name)
+#endif
             {
                 _Attributes = attributes;
                 foreach (Attribute attribute in attributes)

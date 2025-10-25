@@ -33,13 +33,22 @@ namespace Runic.C
                 Expression _address;
                 public Expression Address { get { return _address; } }
                 Type _type;
+#if NET6_0_OR_GREATER
                 public override Type? Type { get { return _type; } }
-                Token? _operator;
-                internal Token? DerefOp { get { return _operator; } }
-                internal Dereference(Token? op, Expression address)
+#else
+                public override Type Type { get { return _type; } }
+#endif
+                Token _operator;
+                internal Token Operator { get { return _operator; } }
+                internal Dereference(Token op, Expression address)
                 {
                     _address = address;
+                    _operator = op;
+#if NET6_0_OR_GREATER
                     Type.Pointer? pointerType = address.Type as Type.Pointer;
+#else
+                    Type.Pointer pointerType = address.Type as Type.Pointer;
+#endif
                     if (pointerType != null) { _type = pointerType.TargetType; }
                     else { _type = new Type.Int(op); }
                 }

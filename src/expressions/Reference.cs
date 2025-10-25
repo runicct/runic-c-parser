@@ -32,9 +32,9 @@ namespace Runic.C
         {
             public class Reference : Expression
             {
-                Token? _operator;
-                public Token? Operator { get { return _operator; } }
-                internal Reference(Token? op)
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+                internal Reference(Token op)
                 {
                     _operator = op;
                 }
@@ -48,8 +48,12 @@ namespace Runic.C
                 Variable _variable;
                 public Variable Variable { get { return _variable; } }
                 Type _type;
+#if NET6_0_OR_GREATER
                 public override Type? Type { get { return _type; } }
-                internal VariableReference(Token? op, Variable variable) : base(op)
+#else
+                public override Type Type { get { return _type; } }
+#endif
+                internal VariableReference(Token op, Variable variable) : base(op)
                 {
                     _type = variable.Type.MakePointer(op);
                     _variable = variable;
@@ -66,14 +70,22 @@ namespace Runic.C
                 Field[] _fields;
                 public Field[] Fields { get { return _fields; } }
                 Type _type;
+#if NET6_0_OR_GREATER
                 public override Type? Type { get { return _type; } }
-                internal MemberReference(Token? op, Variable variable, Field[] fields) : base(op)
+#else
+                public override Type Type { get { return _type; } }
+#endif
+                internal MemberReference(Token op, Variable variable, Field[] fields) : base(op)
                 {
                     _variable = variable;
                     _fields = fields;
                     if (_fields.Length > 0 && _fields[_fields.Length - 1] != null)
                     {
+#if NET6_0_OR_GREATER
                         Type? fieldType = _fields[_fields.Length - 1].Type;
+#else
+                        Type fieldType = _fields[_fields.Length - 1].Type;
+#endif
                         if (fieldType != null) { _type = fieldType.MakePointer(op); }
                         else { _type = variable.Type.MakePointer(op); }
                     }
@@ -103,12 +115,20 @@ namespace Runic.C
                 Expression _index;
                 public Expression Index { get { return _index; } }
                 Type _type;
+#if NET6_0_OR_GREATER
                 public override Type? Type { get { return _type; } }
-                internal IndexingReference(Token? op, Expression target, Expression index) : base(op)
+#else
+                public override Type Type { get { return _type; } }
+#endif
+                internal IndexingReference(Token op, Expression target, Expression index) : base(op)
                 {
                     _target = target;
                     _index = index;
+#if NET6_0_OR_GREATER
                     Type? targetType = target.Type;
+#else
+                    Type targetType = target.Type;
+#endif
                     if (targetType != null)
                     {
                         switch (targetType)

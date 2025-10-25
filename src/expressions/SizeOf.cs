@@ -30,18 +30,25 @@ namespace Runic.C
         {
             public abstract class SizeOf : Expression
             {
+                Token _sizeofKeyword;
+                public Token Keyword { get { return _sizeofKeyword; } }
+                Token _leftParenthesis;
+                public Token LeftParenthesis { get { return _leftParenthesis; } }
+                Token _rightParenthesis;
+                public Token RightParenthesis { get { return _rightParenthesis; } }
+                internal SizeOf(Token sizeofKeyword, Token leftParenthesis, Token rightParenthesis)
+                {
+                    _sizeofKeyword = sizeofKeyword;
+                    _leftParenthesis = leftParenthesis;
+                    _rightParenthesis = rightParenthesis;
+                }
                 public class SizeOfExpression : SizeOf
                 {
                     Expression _expression;
                     public Expression Expression { get { return _expression; } }
-                    Token _sizeofKeyword;
-                    Token _leftParenthesis;
-                    Token _rightParenthesis;
-                    internal SizeOfExpression(Token sizeofKeyword, Token leftParenthesis, Expression Expression, Token rightParenthesis)
+
+                    internal SizeOfExpression(Token sizeofKeyword, Token leftParenthesis, Expression Expression, Token rightParenthesis) : base(sizeofKeyword, leftParenthesis, rightParenthesis)
                     {
-                        _sizeofKeyword = sizeofKeyword;
-                        _leftParenthesis = leftParenthesis;
-                        _rightParenthesis = rightParenthesis;
                         _expression = Expression;
                     }
                     public override string ToString()
@@ -53,14 +60,8 @@ namespace Runic.C
                 {
                     Type _targetType;
                     public Type TargetType { get { return _targetType; } }
-                    Token _sizeofKeyword;
-                    Token _leftParenthesis;
-                    Token _rightParenthesis;
-                    internal SizeOfType(Token sizeofKeyword, Token leftParenthesis, Type type, Token rightParenthesis)
+                    internal SizeOfType(Token sizeofKeyword, Token leftParenthesis, Type type, Token rightParenthesis) : base(sizeofKeyword, leftParenthesis, rightParenthesis)
                     {
-                        _sizeofKeyword = sizeofKeyword;
-                        _leftParenthesis = leftParenthesis;
-                        _rightParenthesis = rightParenthesis;
                         _targetType = type;
                     }
                     public override string ToString()

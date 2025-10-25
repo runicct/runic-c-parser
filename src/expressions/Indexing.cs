@@ -34,20 +34,29 @@ namespace Runic.C
                 public Expression Index { get { return _index; } }
                 Expression _target;
                 public Expression Target { get { return _target; } }
+#if NET6_0_OR_GREATER
                 Type? _type;
                 public Type? Type { get { return _type; } }
-                internal Indexing(Token? Token, Expression Target, Expression Index)
+#else
+                Type _type;
+                public Type Type { get { return _type; } }
+#endif
+                internal Indexing(Token token, Expression target, Expression index)
                 {
-                    _target = Target;
-                    _index = Index;
-                    Type? targetType = Target.Type;
+                    _target = target;
+                    _index = index;
+#if NET6_0_OR_GREATER
+                    Type? targetType = target.Type;
+#else
+                    Type targetType = target.Type;
+#endif
                     if (targetType != null)
                     {
                         switch (targetType)
                         {
                             case Type.Pointer pointer: _type = pointer.TargetType; break;
                             case Type.StaticArray array: _type = array.TargetType; break;
-                            default: _type = new Type.Int(Token); break;
+                            default: _type = new Type.Int(token); break;
                         }
                     }
                 }

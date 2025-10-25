@@ -43,11 +43,11 @@ namespace Runic.C
                 public Expression Left { get { return _left; } }
                 Expression _right;
                 public Expression Right { get { return _right; } }
-                Token? _operator;
-                public Token? Operator { get { return _operator; } }
+                Token _operator;
+                public Token Operator { get { return _operator; } }
                 ComparisonOperation _operation;
                 public ComparisonOperation Operation { get { return _operation; } }
-                internal Comparison(ComparisonOperation operation, Token? opToken, Expression left, Expression right)
+                internal Comparison(ComparisonOperation operation, Token opToken, Expression left, Expression right)
                 {
                     _left = left;
                     _right = right;

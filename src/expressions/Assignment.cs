@@ -32,10 +32,21 @@ namespace Runic.C
             {
                 public class VariableAssignment : Assignment
                 {
+#if NET6_0_OR_GREATER
                     Token? _op;
                     Variable? _target;
                     public Variable? Target { get { return _target; } }
+#else
+                    Token _op;
+                    Variable _target;
+                    public Variable Target { get { return _target; } }
+#endif
+
+#if NET6_0_OR_GREATER
                     internal VariableAssignment(Token? op, Variable? target, Expression value) : base(op, value)
+#else
+                    internal VariableAssignment(Token op, Variable target, Expression value) : base(op, value)
+#endif
                     {
                         _op = op;
                         _target = target;
@@ -48,12 +59,22 @@ namespace Runic.C
                 }
                 public class MemberAssignment : Assignment
                 {
+#if NET6_0_OR_GREATER
                     Variable? _target;
                     public Variable? Target { get { return _target; } }
                     Field[]? _fields;
                     public Field[] Fields { get { return _fields; } }
-
+#else
+                    Variable _target;
+                    public Variable Target { get { return _target; } }
+                    Field[] _fields;
+                    public Field[] Fields { get { return _fields; } }
+#endif
+#if NET6_0_OR_GREATER
                     internal MemberAssignment(Token? op, Variable? variable, Field[] fields, Expression value) : base(op, value)
+#else
+                    internal MemberAssignment(Token op, Variable variable, Field[] fields, Expression value) : base(op, value)
+#endif
                     {
                         _target = variable;
                         _fields = fields;
@@ -70,8 +91,11 @@ namespace Runic.C
                     public Expression Target { get { return _target; } }
                     Expression _index;
                     public Expression Index { get { return _index; } }
-
+#if NET6_0_OR_GREATER
                     internal IndexingAssignment(Token? op, Expression target, Expression index, Expression value) : base(op, value)
+#else
+                    internal IndexingAssignment(Token op, Expression target, Expression index, Expression value) : base(op, value)
+#endif
                     {
                         _target = target;
                         _index = index;
@@ -83,10 +107,22 @@ namespace Runic.C
                 }
                 public class DereferenceAssignment : Assignment
                 {
+#if NET6_0_OR_GREATER
+
                     Token? _derefOp;
                     Expression _target;
                     public Expression Target { get { return _target; } }
+#else
+
+                    Token _derefOp;
+                    Expression _target;
+                    public Expression Target { get { return _target; } }
+#endif
+#if NET6_0_OR_GREATER
                     internal DereferenceAssignment(Token? op, Token? derefOp, Expression target, Expression value) : base(op, value)
+#else
+                    internal DereferenceAssignment(Token op, Token derefOp, Expression target, Expression value) : base(op, value)
+#endif
                     {
                         _derefOp = derefOp;
                         _target = target;
@@ -98,8 +134,9 @@ namespace Runic.C
                 }
                 Expression _value;
                 public Expression Value { get { return _value; } }
-                Token? _operator;
-                internal Assignment(Token? op, Expression value)
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+                internal Assignment(Token op, Expression value)
                 {
                     _operator = op;
                     _value = value;

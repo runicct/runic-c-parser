@@ -32,9 +32,9 @@ namespace Runic.C
         {
             public class Constant : Expression
             {
-                Token[]? _tokens;
-                public Token[]? Tokens { get { return _tokens; } }
-                internal Constant(Token[]? tokens) { _tokens = tokens; }
+                Token[] _tokens;
+                public Token[] Tokens { get { return _tokens; } }
+                internal Constant(Token[] tokens) { _tokens = tokens; }
                 public override string ToString()
                 {
                     if (_tokens == null || _tokens.Length == 0) { return ""; }

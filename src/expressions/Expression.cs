@@ -22,6 +22,10 @@
  * SOFTWARE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -39,7 +43,11 @@ namespace Runic.C
                 }
 
                 public void Push(Expression expression) { _expressions.Push(expression); }
+#if NET6_0_OR_GREATER
                 public Expression Pop(Token? token)
+#else
+                public Expression Pop(Token token)
+#endif
                 {
                     if (_expressions.Count == 0)
                     {
@@ -47,7 +55,11 @@ namespace Runic.C
                     }
                     return _expressions.Pop();
                 }
+#if NET6_0_OR_GREATER
                 public Expression? Peek()
+#else
+                public Expression Peek()
+#endif
                 {
                     if (_expressions.Count == 0)
                     {
@@ -66,25 +78,42 @@ namespace Runic.C
             }
             class Operator
             {
-                Type? _type;
-                public Type? Type { get { return _type; } }
-                Token? _token;
-                public Token? Token { get { return _token; } }
+
+                Token _token;
+                public Token Token { get { return _token; } }
                 OperatorFlag _flag;
                 public OperatorFlag Flag { get { return _flag; } }
-                public Operator(Token? token, OperatorFlag flag)
+                public Operator(Token token, OperatorFlag flag)
                 {
                     _token = token;
                     _flag = flag;
                 }
-                public Operator(Token? token, Type? type)
+            }
+            class CastOperator : Operator
+            {
+                Token _leftParenthesis;
+                public Token LeftParenthesis { get { return _leftParenthesis; } }
+                Token _rightParenthesis;
+                public Token RightParenthesis { get { return _rightParenthesis; } }
+#if NET6_0_OR_GREATER
+                Type? _type;
+                public Type? Type { get { return _type; } }
+#else
+                Type _type;
+                public Type Type { get { return _type; } }
+#endif
+#if NET6_0_OR_GREATER
+                public CastOperator(Token leftParenthesis, Type? type, Token rightParenthesis) : base(leftParenthesis, OperatorFlag.Cast)
+#else
+                public CastOperator(Token leftParenthesis, Type type, Token rightParenthesis) : base(leftParenthesis, OperatorFlag.Cast)
+#endif
                 {
-                    _token = token;
                     _type = type;
-                    _flag = OperatorFlag.Cast;
+                    _leftParenthesis = leftParenthesis;
+                    _rightParenthesis = rightParenthesis;
                 }
             }
-            class OperatorStackStack
+                class OperatorStackStack
             {
                 Parser _context;
                 Stack<Token> _tokens = new Stack<Token>();
@@ -97,7 +126,11 @@ namespace Runic.C
                 }
 
                 public void Push(Token token, OperatorFlag flag) { _tokens.Push(token); _flags.Push(flag); }
+#if NET6_0_OR_GREATER
                 public (Token?, OperatorFlag) Pop()
+#else
+                public (Token, OperatorFlag) Pop()
+#endif
                 {
                     if (_tokens.Count == 0)
                     {
@@ -105,7 +138,11 @@ namespace Runic.C
                     }
                     return (_tokens.Pop(), _flags.Pop());
                 }
+#if NET6_0_OR_GREATER
                 public (Token?, OperatorFlag) Peek()
+#else
+                public (Token, OperatorFlag) Peek()
+#endif
                 {
                     if (_tokens.Count == 0)
                     {
@@ -117,13 +154,25 @@ namespace Runic.C
             }
             static Expression ProcessAssignment(Parser context, Token token, Expression left, Expression right)
             {
+#if NET6_0_OR_GREATER
                 VariableUse? leftVarible = left as VariableUse;
+#else
+                VariableUse leftVarible = left as VariableUse;
+#endif
                 if (leftVarible == null)
                 {
+#if NET6_0_OR_GREATER
                     Indexing? leftIndexing = left as Indexing;
+#else
+                    Indexing leftIndexing = left as Indexing;
+#endif
                     if (leftIndexing == null)
                     {
+#if NET6_0_OR_GREATER
                         Dereference? leftDereference = left as Dereference;
+#else
+                        Dereference leftDereference = left as Dereference;
+#endif
                         if (leftDereference == null)
                         {
                             context.Error_InvalidAssignmentTarget(token, left);
@@ -131,7 +180,7 @@ namespace Runic.C
                         }
                         else
                         {
-                            return new Assignment.DereferenceAssignment(token, leftDereference.DerefOp, leftDereference.Address, right);
+                            return new Assignment.DereferenceAssignment(token, leftDereference.Operator, leftDereference.Address, right);
                         }
                     }
                     else
@@ -141,7 +190,11 @@ namespace Runic.C
                 }
                 else
                 {
+#if NET6_0_OR_GREATER
                     MemberUse? leftField = leftVarible as MemberUse;
+#else
+                    MemberUse leftField = leftVarible as MemberUse;
+#endif
                     if (leftField != null)
                     {
                         return new Assignment.MemberAssignment(token, leftField.Variable, leftField.Fields, right);
@@ -154,13 +207,25 @@ namespace Runic.C
             }
             static Expression ProcessIncrement(Parser context, Token token, bool postfix, bool decrement, Expression target)
             {
+#if NET6_0_OR_GREATER
                 VariableUse? variableUse = target as VariableUse;
+#else
+                VariableUse variableUse = target as VariableUse;
+#endif
                 if (variableUse == null)
                 {
+#if NET6_0_OR_GREATER
                     Indexing? indexing = target as Indexing;
+#else
+                    Indexing indexing = target as Indexing;
+#endif
                     if (indexing == null)
                     {
+#if NET6_0_OR_GREATER
                         Dereference? dereference = target as Dereference;
+#else
+                        Dereference dereference = target as Dereference;
+#endif
                         if (dereference == null)
                         {
                             context.Error_InvalidAssignmentTarget(token, target);
@@ -170,12 +235,12 @@ namespace Runic.C
                         {
                             if (postfix)
                             {
-                                if (decrement) { return new Decrement.Postfix.Dereference(token, dereference.DerefOp, dereference.Address); }
+                                if (decrement) { return new Decrement.Postfix.Dereference(token, dereference.Operator, dereference.Address); }
                                 else { return new Increment.Postfix.Dereference(token, dereference.Address); }
                             }
                             else
                             {
-                                if (decrement) { return new Decrement.Prefix.Dereference(token, dereference.DerefOp, dereference.Address); }
+                                if (decrement) { return new Decrement.Prefix.Dereference(token, dereference.Operator, dereference.Address); }
                                 else { return new Increment.Prefix.Dereference(token, dereference.Address); }
                             }
                         }
@@ -196,7 +261,11 @@ namespace Runic.C
                 }
                 else
                 {
+#if NET6_0_OR_GREATER
                     MemberUse? memberUse = variableUse as MemberUse;
+#else
+                    MemberUse memberUse = variableUse as MemberUse;
+#endif
                     if (memberUse == null)
                     {
                         if (postfix)
@@ -227,10 +296,15 @@ namespace Runic.C
             }
             static Expression ProcessOperator(Parser Context, Operator Operator, ExpressionStack Expressions)
             {
+#if NET6_0_OR_GREATER
                 Token? token = Operator.Token;
+#else
+                Token token = Operator.Token;
+#endif
                 if (Operator.Flag == OperatorFlag.Cast)
                 {
-                    Type.StructOrUnion structOrUnion = Operator.Type as Type.StructOrUnion;
+                    CastOperator castOperator = Operator as CastOperator;
+                    Type.StructOrUnion structOrUnion = castOperator.Type as Type.StructOrUnion;
                     Expression value = Expressions.Pop(token);
                     switch (value)
                     {
@@ -241,7 +315,7 @@ namespace Runic.C
                             if (structOrUnion != null) { return CompoundLiteralsStruct.Create(Context, literalsFields, structOrUnion); }
                             break;
                     }
-                    return new Cast(token, Operator.Type, value);
+                    return new Cast(castOperator.LeftParenthesis, castOperator.Type, castOperator.RightParenthesis, value);
                 }
                 switch (token.Value)
                 {
@@ -350,7 +424,11 @@ namespace Runic.C
                         {
                             Expression right = Expressions.Pop(token);
                             Expression left = Expressions.Pop(token);
+#if NET6_0_OR_GREATER
                             VariableUse? leftVarible = left as VariableUse;
+#else
+                            VariableUse leftVarible = left as VariableUse;
+#endif
                             return ProcessAssignment(Context, token, left, new Mul(token, left, right));
                         }
                     case "/":
@@ -429,9 +507,8 @@ namespace Runic.C
                 throw new Exception(token.File + " " + token.StartLine.ToString() + " " + token.Value);
                 return null;
             }
-            static bool IsOperator(Token? Token)
+            static bool IsOperator(Token Token)
             {
-                if (Token == null) { return false; }
                 switch (Token.Value)
                 {
                     case "(":
@@ -483,12 +560,10 @@ namespace Runic.C
             }
             static int GetPrecendence(Operator op)
             {
-                return GetPrecendence(op.Token == null ? null : op.Token.Value, op.Flag);
+                return GetPrecendence(op.Token.Value, op.Flag);
             }
-            static int GetPrecendence(string? op, OperatorFlag flags)
+            static int GetPrecendence(string op, OperatorFlag flags)
             {
-                if (op == null) { return int.MaxValue; }
-
                 if ((flags & OperatorFlag.Cast) != 0) { return 2; }
                 if ((flags & OperatorFlag.Postfix) != 0)
                 {
@@ -506,11 +581,21 @@ namespace Runic.C
                 }
                 return OperatorPrecedence.GetPrecendence(op);
             }
+#if NET6_0_OR_GREATER
             internal static Expression? ParseFunctionCall(Function Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
+#else
+            internal static Expression ParseFunctionCall(Function Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? leftParenthesis;
                 Token? rightParenthesis = null;
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Token leftParenthesis;
+                Token rightParenthesis = null;
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null) { return null; }
                 if (token.Value != "(")
                 {
@@ -520,7 +605,11 @@ namespace Runic.C
                 leftParenthesis = token;
                 int parameterIndex = 0;
                 List<Expression> parameters = new List<Expression>();
+#if NET6_0_OR_GREATER
                 Expression? parameter = null;
+#else
+                Expression parameter = null;
+#endif
                 token = TokenQueue.PeekToken();
                 if (token == null || token.Value == ")")
                 {
@@ -595,13 +684,21 @@ namespace Runic.C
             }
             static Expression.Constant ParseStringConstant(Parser Context, Token firstToken, TokenQueue tokenQueue)
             {
+#if NET6_0_OR_GREATER
                 Token? token = firstToken;
+#else
+                Token token = firstToken;
+#endif
                 List<Token> stringLiteral = new List<Token>();
                 stringLiteral.Add(token);
                 while (true)
                 {
+#if NET6_0_OR_GREATER
                     Token? next = tokenQueue.PeekToken();
-                    if (next == null)
+#else
+                    Token next = tokenQueue.PeekToken();
+#endif
+                    if (next == null || next.Value == null)
                     {
                         Context.Error_IncompleteExpression(firstToken);
                         return new Expression.Constant(stringLiteral.ToArray());
@@ -618,7 +715,11 @@ namespace Runic.C
                 }
                 return new Expression.Constant(stringLiteral.ToArray());
             }
+#if NET6_0_OR_GREATER
             static Type.StructOrUnion? ResolveType(Type.StructOrUnion? structOrUnion)
+#else
+            static Type.StructOrUnion ResolveType(Type.StructOrUnion structOrUnion)
+#endif
             {
                 if (structOrUnion == null) { return null; }
                 while (structOrUnion.Declaration != null && structOrUnion.Declaration != structOrUnion)
@@ -627,18 +728,31 @@ namespace Runic.C
                 }
                 if (structOrUnion.Declaration == null && structOrUnion.Name != null && structOrUnion.ParentScope != null)
                 {
+#if NET6_0_OR_GREATER
                     IScope? scope = structOrUnion.ParentScope;
                     Type? type = scope.ResolveType(structOrUnion.Name.Value);
+#else
+                    IScope scope = structOrUnion.ParentScope;
+                    Type type = scope.ResolveType(structOrUnion.Name.Value);
+#endif
                     if (type == null) { return null; }
                     return type as Type.StructOrUnion;
                 }
                 return null;
             }
+#if NET6_0_OR_GREATER
             internal static Expression? Parse(IScope ParentScope, Parser Context, TokenQueue TokenQueue, bool StopOnComma = true)
+#else
+            internal static Expression Parse(IScope ParentScope, Parser Context, TokenQueue TokenQueue, bool StopOnComma = true)
+#endif
             {
                 ExpressionStack expressions = new ExpressionStack(Context);
                 Stack<Operator> operators = new Stack<Operator>();
+#if NET6_0_OR_GREATER
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null) { return null; }
                 Token lastValidToken = token;
                 OperatorFlag flag = OperatorFlag.Unary;
@@ -699,19 +813,35 @@ namespace Runic.C
                         operators.Pop();
                         flag &= ~OperatorFlag.Unary;
                         flag &= ~OperatorFlag.Postfix;
+#if NET6_0_OR_GREATER
                         Expression? topOfStack = expressions.Peek();
+#else
+                        Expression topOfStack = expressions.Peek();
+#endif
                         if (topOfStack != null)
                         {
+#if NET6_0_OR_GREATER
                             Type? expressionType = topOfStack.Type;
+#else
+                            Type expressionType = topOfStack.Type;
+#endif
                             if (expressionType != null && expressionType is Type.FunctionPointerType) { flag |= OperatorFlag.MaybeFunction; }
                         }
                     }
                     else if (token.Value == "{")
                     {
+#if NET6_0_OR_GREATER
                         Token? opToken = token;
+#else
+                        Token opToken = token;
+#endif
                         flag &= ~OperatorFlag.MaybeFunction;
                         List<Expression> ordinalField = new List<Expression>();
+#if NET6_0_OR_GREATER
                         Token? fieldOrValue = TokenQueue.ReadNextToken();
+#else
+                        Token fieldOrValue = TokenQueue.ReadNextToken();
+#endif
                         if (fieldOrValue == null)
                         {
                             Context.Error_IncompleteExpression(lastValidToken);
@@ -729,7 +859,11 @@ namespace Runic.C
                             }
                             while (true)
                             {
+#if NET6_0_OR_GREATER
                                 Token? fieldName = TokenQueue.ReadNextToken();
+#else
+                                Token fieldName = TokenQueue.ReadNextToken();
+#endif
                                 if (fieldName == null)
                                 {
                                     Context.Error_IncompleteExpression(fieldOrValue);
@@ -740,7 +874,11 @@ namespace Runic.C
                                     Context.Error_InvalidIdentifier(fieldOrValue);
                                     fieldName = null;
                                 }
+#if NET6_0_OR_GREATER
                                 Token? assignmentOperator = TokenQueue.ReadNextToken();
+#else
+                                Token assignmentOperator = TokenQueue.ReadNextToken();
+#endif
                                 if (assignmentOperator == null)
                                 {
                                     Context.Error_IncompleteExpression(fieldName);
@@ -772,7 +910,11 @@ namespace Runic.C
                                     }
                                 }
 
+#if NET6_0_OR_GREATER
                                 Token? endOrComma = TokenQueue.ReadNextToken();
+#else
+                                Token endOrComma = TokenQueue.ReadNextToken();
+#endif
                                 if (endOrComma == null)
                                 {
                                     Context.Error_IncompleteExpression(fieldOrValue);
@@ -801,7 +943,11 @@ namespace Runic.C
                                 usedCommaBefore = true;
                                 lastValidToken = endOrComma;
                                 nextField:;
+#if NET6_0_OR_GREATER
                                 Token? nextFieldPeriod = TokenQueue.ReadNextToken();
+#else
+                                Token nextFieldPeriod = TokenQueue.ReadNextToken();
+#endif
                                 if (nextFieldPeriod == null)
                                 {
                                     Context.Error_IncompleteExpression(lastValidToken);
@@ -841,7 +987,11 @@ namespace Runic.C
                             while (true)
                             {
                                 nextValue:;
+#if NET6_0_OR_GREATER
                                 Token? checkForMixedType = TokenQueue.PeekToken();
+#else
+                                Token checkForMixedType = TokenQueue.PeekToken();
+#endif
                                 if (checkForMixedType == null)
                                 {
                                     Context.Error_IncompleteExpression(lastValidToken);
@@ -854,7 +1004,11 @@ namespace Runic.C
                                         // TODO Report the error
                                         mixedTypeReported = true;
                                     }
+#if NET6_0_OR_GREATER
                                     Token? skipUntilAssignment = TokenQueue.ReadNextToken();
+#else
+                                    Token skipUntilAssignment = TokenQueue.ReadNextToken();
+#endif
                                     while (true)
                                     {
                                         skipUntilAssignment = TokenQueue.ReadNextToken();
@@ -868,10 +1022,18 @@ namespace Runic.C
                                     Expression.Parse(ParentScope, Context, TokenQueue);
                                     goto endOrCommaParsing;
                                 }
+#if NET6_0_OR_GREATER
                                 Expression? expression = Expression.Parse(ParentScope, Context, TokenQueue);
+#else
+                                Expression expression = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
                                 if (expression != null) { fields.Add(expression); }
                                 endOrCommaParsing:;
+#if NET6_0_OR_GREATER
                                 Token? endOrComma = TokenQueue.ReadNextToken();
+#else
+                                Token endOrComma = TokenQueue.ReadNextToken();
+#endif
                                 if (endOrComma == null)
                                 {
                                     Context.Error_IncompleteExpression(lastValidToken);
@@ -910,7 +1072,11 @@ namespace Runic.C
                         flag &= ~OperatorFlag.MaybeFunction;
 
                         Token bracket = token;
+#if NET6_0_OR_GREATER
                         Expression? index = Parse(ParentScope, Context, TokenQueue);
+#else
+                        Expression index = Parse(ParentScope, Context, TokenQueue);
+#endif
                         if (index == null)
                         {
                             Context.Error_InvalidIndex(token);
@@ -930,9 +1096,14 @@ namespace Runic.C
                     {
                         if (token.Value == "(")
                         {
+#if NET6_0_OR_GREATER
                             Token? leftParenthesis = token;
-                            flag &= ~OperatorFlag.Postfix;
                             Token? maybeTypeToken = TokenQueue.ReadNextToken();
+#else
+                            Token leftParenthesis = token;
+                            Token maybeTypeToken = TokenQueue.ReadNextToken();
+#endif
+                            flag &= ~OperatorFlag.Postfix;
                             if (maybeTypeToken == null)
                             {
                                 Context.Error_IncompleteExpression(token);
@@ -944,7 +1115,11 @@ namespace Runic.C
                             }
                             else if (Identifier.IsValid(maybeTypeToken, Context.StandardRevision))
                             {
+#if NET6_0_OR_GREATER
                                 Variable? variable = ParentScope.ResolveVariable(maybeTypeToken.Value);
+#else
+                                Variable variable = ParentScope.ResolveVariable(maybeTypeToken.Value);
+#endif
                                 if (variable != null)
                                 {
                                     operators.Push(new Operator(token, OperatorFlag.None));
@@ -952,7 +1127,11 @@ namespace Runic.C
                                 }
                                 else
                                 {
+#if NET6_0_OR_GREATER
                                     Type.Enum.Member? enumMember = ParentScope.ResolveEnumMember(maybeTypeToken.Value);
+#else
+                                    Type.Enum.Member enumMember = ParentScope.ResolveEnumMember(maybeTypeToken.Value);
+#endif
                                     if (enumMember != null)
                                     {
                                         operators.Push(new Operator(token, OperatorFlag.None));
@@ -960,14 +1139,26 @@ namespace Runic.C
                                     }
                                     else
                                     {
+#if NET6_0_OR_GREATER
                                         Function? function = ParentScope.ResolveFunction(token.Value);
+#else
+                                        Function function = ParentScope.ResolveFunction(token.Value);
+#endif
                                         if (function != null)
                                         {
+#if NET6_0_OR_GREATER
                                             Token? nextToken = TokenQueue.PeekToken();
+#else
+                                            Token nextToken = TokenQueue.PeekToken();
+#endif
                                             if (nextToken != null && nextToken.Value == "(")
                                             {
                                                 // We have a function call they need to be processed differently
+#if NET6_0_OR_GREATER
                                                 Expression? functionCall = ParseFunctionCall(function, ParentScope, Context, TokenQueue);
+#else
+                                                Expression functionCall = ParseFunctionCall(function, ParentScope, Context, TokenQueue);
+#endif
                                                 if (functionCall == null) { expressions.Push(new Expression.Constant(new Token[] { })); }
                                                 else { expressions.Push(functionCall); }
                                             }
@@ -975,10 +1166,18 @@ namespace Runic.C
                                         }
                                         else
                                         {
+#if NET6_0_OR_GREATER
                                             Type? type = ParentScope.ResolveType(maybeTypeToken.Value);
+#else
+                                            Type type = ParentScope.ResolveType(maybeTypeToken.Value);
+#endif
                                             if (type != null)
                                             {
+#if NET6_0_OR_GREATER
                                                 Token? next = TokenQueue.ReadNextToken();
+#else
+                                                Token next = TokenQueue.ReadNextToken();
+#endif
                                                 if (next == null)
                                                 {
                                                     Context.Error_IncompleteExpression(maybeTypeToken);
@@ -999,7 +1198,7 @@ namespace Runic.C
                                                     Context.Error_InvalidCast(type, next);
                                                     break;
                                                 }
-                                                operators.Push(new Operator(maybeTypeToken, type));
+                                                operators.Push(new CastOperator(leftParenthesis, type, next));
                                             }
                                         }
                                     }
@@ -1013,7 +1212,11 @@ namespace Runic.C
                                     flag &= ~OperatorFlag.Unary;
                                     if ((flag & OperatorFlag.MaybeFunction) != 0)
                                     {
+#if NET6_0_OR_GREATER
                                         Expression? function = expressions.Pop(maybeTypeToken);
+#else
+                                        Expression function = expressions.Pop(maybeTypeToken);
+#endif
                                         if (function == null)
                                         {
                                             // This should not happend
@@ -1022,7 +1225,11 @@ namespace Runic.C
                                         else
                                         {
                                             expressions.Push(new IndirectCall(function, leftParenthesis, new Expression[] { }, maybeTypeToken));
+#if NET6_0_OR_GREATER
                                             Type? functionType = function.Type;
+#else
+                                            Type functionType = function.Type;
+#endif
                                             if (functionType != null && functionType is Type.FunctionPointerType) { flag |= OperatorFlag.MaybeFunction; }
                                             else { flag &= ~OperatorFlag.MaybeFunction; }
                                         }
@@ -1042,10 +1249,18 @@ namespace Runic.C
                             }
                             else
                             {
+#if NET6_0_OR_GREATER
                                 Type? type = Type.Parse(ParentScope, Context, maybeTypeToken, TokenQueue);
+#else
+                                Type type = Type.Parse(ParentScope, Context, maybeTypeToken, TokenQueue);
+#endif
                                 if (type != null)
                                 {
+#if NET6_0_OR_GREATER
                                     Token? next = TokenQueue.ReadNextToken();
+#else
+                                    Token next = TokenQueue.ReadNextToken();
+#endif
                                     if (next == null)
                                     {
                                         Context.Error_IncompleteExpression(maybeTypeToken);
@@ -1056,7 +1271,7 @@ namespace Runic.C
                                         Context.Error_InvalidCast(type, next);
                                         break;
                                     }
-                                    operators.Push(new Operator(maybeTypeToken, type));
+                                    operators.Push(new CastOperator(leftParenthesis, type, next));
                                     flag &= ~OperatorFlag.Unary;
                                     if (type is Type.FunctionPointerType) { flag |= OperatorFlag.MaybeFunction; }
                                 }
@@ -1094,11 +1309,17 @@ namespace Runic.C
                         {
                             if (token.Value == "sizeof")
                             {
+#if NET6_0_OR_GREATER
                                 Token? sizeOfKeyword = token;
                                 Token? next = TokenQueue.ReadNextToken();
                                 Token? leftParenthesis = null;
                                 Token? rightParenthesis = null;
-
+#else
+                                Token sizeOfKeyword = token;
+                                Token next = TokenQueue.ReadNextToken();
+                                Token leftParenthesis = null;
+                                Token rightParenthesis = null;
+#endif
                                 if (next == null)
                                 {
                                     break;
@@ -1115,8 +1336,11 @@ namespace Runic.C
                                 {
                                     break;
                                 }
-
+#if NET6_0_OR_GREATER
                                 Type? type = Type.Parse(ParentScope, Context, next, TokenQueue);
+#else
+                                Type type = Type.Parse(ParentScope, Context, next, TokenQueue);
+#endif
                                 if (type != null)
                                 {
                                     rightParenthesis = TokenQueue.ReadNextToken();
@@ -1131,7 +1355,11 @@ namespace Runic.C
                                 {
 
                                     TokenQueue.FrontLoadToken(token);
+#if NET6_0_OR_GREATER
                                     Expression? expression = Expression.Parse(ParentScope, Context, TokenQueue, false);
+#else
+                                    Expression expression = Expression.Parse(ParentScope, Context, TokenQueue, false);
+#endif
                                     rightParenthesis = TokenQueue.ReadNextToken();
                                     if (rightParenthesis == null || next.Value != ")")
                                     {
@@ -1150,8 +1378,11 @@ namespace Runic.C
                             }
                             else if (Identifier.IsValid(token, Context.StandardRevision))
                             {
+#if NET6_0_OR_GREATER
                                 Token? topOperator = null;
-
+#else
+                                Token topOperator = null;
+#endif
                                 if (operators.Count > 0) { topOperator = operators.Peek().Token; }
 
                                 if (topOperator != null && (topOperator.Value == "." || topOperator.Value == "->"))
@@ -1165,15 +1396,28 @@ namespace Runic.C
                                     }
                                     else
                                     {
+#if NET6_0_OR_GREATER
                                         MemberUse? memberUse = variableUse as MemberUse;
+#else
+                                        MemberUse memberUse = variableUse as MemberUse;
+#endif
                                         if (memberUse != null)
                                         {
+#if NET6_0_OR_GREATER
                                             Type? variableType = memberUse.Fields[memberUse.Fields.Length - 1].Type;
                                             Type.StructOrUnion? structOrUnionType = null;
+#else
+                                            Type variableType = memberUse.Fields[memberUse.Fields.Length - 1].Type;
+                                            Type.StructOrUnion structOrUnionType = null;
+#endif
                                             if (!dereference) { structOrUnionType = variableType as Type.StructOrUnion; }
                                             else
                                             {
+#if NET6_0_OR_GREATER
                                                 Type.Pointer? pointerToStructOrUnion = variableType as Type.Pointer;
+#else
+                                                Type.Pointer pointerToStructOrUnion = variableType as Type.Pointer;
+#endif
                                                 if (pointerToStructOrUnion != null)
                                                 {
                                                     structOrUnionType = pointerToStructOrUnion.TargetType as Type.StructOrUnion;
@@ -1187,7 +1431,11 @@ namespace Runic.C
                                             }
                                             else
                                             {
+#if NET6_0_OR_GREATER
                                                 Type.StructOrUnion? structOrUnionTypeDefinition = ResolveType(structOrUnionType);
+#else
+                                                Type.StructOrUnion structOrUnionTypeDefinition = ResolveType(structOrUnionType);
+#endif
                                                 if (structOrUnionTypeDefinition == null)
                                                 {
                                                     Context.Error_UseOfIncompleteTypeInFieldAccess(token, structOrUnionType);
@@ -1195,7 +1443,11 @@ namespace Runic.C
                                                 }
                                                 else
                                                 {
+#if NET6_0_OR_GREATER
                                                     Field? field = structOrUnionTypeDefinition.ResolveField(token.Value);
+#else
+                                                    Field field = structOrUnionTypeDefinition.ResolveField(token.Value);
+#endif
                                                     Field[] fieldChain = new Field[memberUse.Fields.Length + 1];
                                                     for (int n = 0; n < memberUse.Fields.Length; n++) { fieldChain[n] = memberUse.Fields[n]; }
                                                     if (field == null) { throw new Exception(); }
@@ -1207,11 +1459,19 @@ namespace Runic.C
                                         else
                                         {
                                             Type variableType = variableUse.Variable.Type;
+#if NET6_0_OR_GREATER
                                             Type.StructOrUnion? structOrUnionType = null;
+#else
+                                            Type.StructOrUnion structOrUnionType = null;
+#endif
                                             if (!dereference) { structOrUnionType = variableType as Type.StructOrUnion; }
                                             else
                                             {
+#if NET6_0_OR_GREATER
                                                 Type.Pointer? pointerToStructOrUnion = variableType as Type.Pointer;
+#else
+                                                Type.Pointer pointerToStructOrUnion = variableType as Type.Pointer;
+#endif
                                                 if (pointerToStructOrUnion != null)
                                                 {
                                                     structOrUnionType = pointerToStructOrUnion.TargetType as Type.StructOrUnion;
@@ -1224,7 +1484,11 @@ namespace Runic.C
                                             }
                                             else
                                             {
+#if NET6_0_OR_GREATER
                                                 Type.StructOrUnion? structOrUnionTypeDefinition = ResolveType(structOrUnionType);
+#else
+                                                Type.StructOrUnion structOrUnionTypeDefinition = ResolveType(structOrUnionType);
+#endif
                                                 if (structOrUnionTypeDefinition == null)
                                                 {
                                                     Context.Error_UseOfIncompleteTypeInFieldAccess(token, structOrUnionType);
@@ -1232,7 +1496,11 @@ namespace Runic.C
                                                 }
                                                 else
                                                 {
+#if NET6_0_OR_GREATER
                                                     Field? field = structOrUnionTypeDefinition.ResolveField(token.Value);
+#else
+                                                    Field field = structOrUnionTypeDefinition.ResolveField(token.Value);
+#endif
                                                     if (field == null)
                                                     {
                                                         Context.Error_FieldDoesNotExistInStruct(token, structOrUnionTypeDefinition);
@@ -1249,25 +1517,45 @@ namespace Runic.C
                                 }
                                 else
                                 {
+#if NET6_0_OR_GREATER
                                     Variable? variable = ParentScope.ResolveVariable(token.Value);
+#else
+                                    Variable variable = ParentScope.ResolveVariable(token.Value);
+#endif
                                     if (variable != null)
                                     {
                                         expressions.Push(new VariableUse(variable));
                                     }
                                     else
                                     {
+#if NET6_0_OR_GREATER
                                         Type.Enum.Member? enumMember = ParentScope.ResolveEnumMember(token.Value);
+#else
+                                        Type.Enum.Member enumMember = ParentScope.ResolveEnumMember(token.Value);
+#endif
                                         if (enumMember != null) { expressions.Push(new EnumMemberUse(enumMember)); }
                                         else
                                         {
+#if NET6_0_OR_GREATER
                                             Function? function = ParentScope.ResolveFunction(token.Value);
+#else
+                                            Function function = ParentScope.ResolveFunction(token.Value);
+#endif
                                             if (function != null)
                                             {
+#if NET6_0_OR_GREATER
                                                 Token? nextToken = TokenQueue.PeekToken();
+#else
+                                                Token nextToken = TokenQueue.PeekToken();
+#endif
                                                 if (nextToken != null && nextToken.Value == "(")
                                                 {
                                                     // We have a function call they need to be processed differently
+#if NET6_0_OR_GREATER
                                                     Expression? functionCall = ParseFunctionCall(function, ParentScope, Context, TokenQueue);
+#else
+                                                    Expression functionCall = ParseFunctionCall(function, ParentScope, Context, TokenQueue);
+#endif
                                                     if (functionCall == null) { expressions.Push(new Expression.Constant(new Token[] { })); }
                                                     else { expressions.Push(functionCall); }
                                                 }
@@ -1340,9 +1628,11 @@ namespace Runic.C
                 }
                 return expressions.Pop(null);
             }
-
-            //public abstract Token FirstToken { get; }
+#if NET6_0_OR_GREATER
             public virtual Type? Type { get { return null; } }
+#else
+            public virtual Type Type { get { return null; } }
+#endif
+            }
         }
-    }
 }

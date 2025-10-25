@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>Runic.C.Parser</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Runic.Statement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Runic.Statement.1.0.1\lib\net48\Runic.Statement.dll</HintPath>

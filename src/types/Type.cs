@@ -28,15 +28,27 @@ namespace Runic.C
     {
         public abstract partial class Type
         {
+#if NET6_0_OR_GREATER
             internal Pointer MakePointer(Token? token)
+#else
+            internal Pointer MakePointer(Token token)
+#endif
             {
                 return new Pointer(this, token);
             }
+#if NET6_0_OR_GREATER
             internal Type MakeConst(Token? token)
+#else
+            internal Type MakeConst(Token token)
+#endif
             {
                 return this;
             }
+#if NET6_0_OR_GREATER
             internal StaticArray MakeStaticArray(Token? token, Expression[] length)
+#else
+            internal StaticArray MakeStaticArray(Token token, Expression[] length)
+#endif
             {
                 return new StaticArray(this, token, length);
             }
@@ -44,16 +56,29 @@ namespace Runic.C
             {
                 return this;
             }
+#if NET6_0_OR_GREATER
             static internal Type? Parse(IScope ParentScope, Parser Context, Token? Type, TokenQueue TokenQueue)
+#else
+            static internal Type Parse(IScope ParentScope, Parser Context, Token Type, TokenQueue TokenQueue)
+#endif
             {
                 bool @const = false; 
                 if (Type == null) { return null; }
                 if (Type.Value == "const") { @const = true; Type = TokenQueue.ReadNextToken(); }
 
+#if NET6_0_OR_GREATER
                 Type? prologueType = ParsePrologue(ParentScope,Context, Type, TokenQueue);
+#else
+                Type prologueType = ParsePrologue(ParentScope, Context, Type, TokenQueue);
+#endif
+
                 if (prologueType == null) { return null; }
 
+#if NET6_0_OR_GREATER
                 Token? parenthesisOrPointer = TokenQueue.PeekToken();
+#else
+                Token parenthesisOrPointer = TokenQueue.PeekToken();
+#endif
                 if (parenthesisOrPointer == null) { return prologueType; }
                 if (parenthesisOrPointer.Value == "const")
                 {
@@ -64,7 +89,12 @@ namespace Runic.C
                 }
                 if (parenthesisOrPointer.Value == "*")
                 {
+#if NET6_0_OR_GREATER
                     Token? pointer = parenthesisOrPointer;
+#else
+                    Token pointer = parenthesisOrPointer;
+#endif
+
                     do
                     {
                         prologueType = prologueType.MakePointer(pointer);
@@ -88,7 +118,11 @@ namespace Runic.C
                 // Function pointer case
                 {
                     TokenQueue.ReadNextToken();
+#if NET6_0_OR_GREATER
                     Token? pointer = TokenQueue.PeekToken();
+#else
+                    Token pointer = TokenQueue.PeekToken();
+#endif
                     if (pointer == null) { return prologueType; }
                     if (pointer.Value != "*") { return prologueType; }
                     TokenQueue.ReadNextToken();
@@ -101,9 +135,17 @@ namespace Runic.C
                     return functionPointer;
                 }
             }
+#if NET6_0_OR_GREATER
             static Type? ParsePrologue(IScope ParentScope, Parser Context, Token? Type, TokenQueue TokenQueue)
+#else
+            static Type ParsePrologue(IScope ParentScope, Parser Context, Token Type, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? nextToken;
+#else
+                Token nextToken;
+#endif
 
                 if (Type == null) { return null; }
                 switch (Type.Value)

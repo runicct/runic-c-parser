@@ -32,22 +32,48 @@ namespace Runic.C
         {
             Scope _body;
             internal Scope Body { get { return _body; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+#endif
+
+#if NET6_0_OR_GREATER
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
+#else
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+#endif
+
+#if NET6_0_OR_GREATER
             public Variable? ResolveVariable(string Name)
+#else
+            public Variable ResolveVariable(string Name)
+#endif
             {
                 return _body.ResolveVariable(Name);
             }
+#if NET6_0_OR_GREATER
             public Function? ResolveFunction(string Name)
+#else
+            public Function ResolveFunction(string Name)
+#endif
             {
                 if (Name == this.Name.Value) { return this; }
                 return _body.ResolveFunction(Name);
             }
+#if NET6_0_OR_GREATER
             public Type.Enum.Member? ResolveEnumMember(string Name)
+#else
+            public Type.Enum.Member ResolveEnumMember(string Name)
+#endif
             {
                 return _body.ResolveEnumMember(Name);
             }
+#if NET6_0_OR_GREATER
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#else
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
             internal FunctionDefinition(IScope ParentScope, Parser Context, Attribute[] Attributes, Type ReturnType,  Token Name, FunctionParameter[] FunctionParameters, bool Variadic) : base (Attributes, ReturnType, Name, FunctionParameters, Variadic)
             {
                 _body = new Scope.FunctionScope(ParentScope, Context, this);

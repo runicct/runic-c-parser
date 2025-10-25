@@ -30,8 +30,9 @@ namespace Runic.C
         {
             public abstract class Increment : Expression
             {
-                Token? _operator;
-                internal Increment(Token? op)
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+                internal Increment(Token op)
                 {
                     _operator = op;
                 }
@@ -41,7 +42,7 @@ namespace Runic.C
                     {
                         Parser.Variable _target;
                         public Parser.Variable Target { get { return _target; } }
-                        internal Variable(Token? op, Parser.Variable target) : base(op)
+                        internal Variable(Token op, Parser.Variable target) : base(op)
                         {
                             _target = target;
                         }
@@ -55,7 +56,7 @@ namespace Runic.C
                     {
                         Expression _address;
                         public Expression Address { get { return _address; } }
-                        internal Dereference(Token? op, Expression address) : base(op)
+                        internal Dereference(Token op, Expression address) : base(op)
                         {
                             _address = address;
                         }
@@ -71,7 +72,7 @@ namespace Runic.C
                         Expression _index;
                         public Expression Index { get { return _index; } }
 
-                        internal Indexing(Token? op, Expression target, Expression index) : base(op)
+                        internal Indexing(Token op, Expression target, Expression index) : base(op)
                         {
                             _target = target;
                             _index = index;
@@ -88,13 +89,13 @@ namespace Runic.C
                         Field[] _fields;
                         public Field[] Fields { get { return _fields; } }
 
-                        internal Member(Token? op, Parser.Variable variable, Field[] fields) : base(op)
+                        internal Member(Token op, Parser.Variable variable, Field[] fields) : base(op)
                         {
                             _target = variable;
                             _fields = fields;
                         }
                     }
-                    public Postfix(Token? op) : base (op)
+                    public Postfix(Token op) : base (op)
                     {
 
                     }
@@ -106,7 +107,7 @@ namespace Runic.C
                     {
                         Parser.Variable _target;
                         public Parser.Variable Target { get { return _target; } }
-                        internal Variable(Token? op, Parser.Variable target) : base(op)
+                        internal Variable(Token op, Parser.Variable target) : base(op)
                         {
                             _target = target;
                         }
@@ -119,7 +120,7 @@ namespace Runic.C
                     {
                         Expression _address;
                         public Expression Address { get { return _address; } }
-                        internal Dereference(Token? op, Expression address) : base(op)
+                        internal Dereference(Token op, Expression address) : base(op)
                         {
                             _address = address;
                         }
@@ -135,7 +136,7 @@ namespace Runic.C
                         Expression _index;
                         public Expression Index { get { return _index; } }
 
-                        internal Indexing(Token? op, Expression target, Expression index) : base(op)
+                        internal Indexing(Token op, Expression target, Expression index) : base(op)
                         {
                             _target = target;
                             _index = index;
@@ -152,13 +153,13 @@ namespace Runic.C
                         Field[] _fields;
                         public Field[] Fields { get { return _fields; } }
 
-                        internal Member(Token? op, Parser.Variable variable, Field[] fields) : base(op)
+                        internal Member(Token op, Parser.Variable variable, Field[] fields) : base(op)
                         {
                             _target = variable;
                             _fields = fields;
                         }
                     }
-                    public Prefix(Token? op) : base(op)
+                    public Prefix(Token op) : base(op)
                     {
 
                     }

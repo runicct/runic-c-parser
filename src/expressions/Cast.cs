@@ -34,12 +34,15 @@ namespace Runic.C
                 public override Type Type { get { return _type; } }
                 Expression _value;
                 public Expression Value { get { return _value; } }
-                Token? _operator;
-                public Token? Operator { get { return _operator; } }
-                internal Cast(Token? op, Type type, Expression value)
+                Token _leftParenthesis;
+                public Token LeftParenthesis { get { return _leftParenthesis; } }
+                Token _rightParenthesis;
+                public Token RightParenthesis { get { return _rightParenthesis; } }
+                internal Cast(Token leftParenthesis, Type type, Token rightParenthesis, Expression value)
                 {
                     _value = value;
-                    _operator = op;
+                    _leftParenthesis = leftParenthesis;
+                    _rightParenthesis = rightParenthesis;
                     _type = type;
                 }
                 public override string ToString()

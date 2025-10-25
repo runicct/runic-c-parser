@@ -28,7 +28,11 @@ namespace Runic.C
     {
         public class Empty : Statement
         {
+#if NET6_0_OR_GREATER
             Token? _separator;
+#else
+            Token _separator;
+#endif
             internal Empty(Token separator)
             {
                 _separator = separator;

@@ -30,13 +30,23 @@ namespace Runic.C
         {
             Scope _body;
             internal Scope Body { get { return _body; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
             public Variable? ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
             Token _elseToken;
+            public Token Keyword { get { return _elseToken; } }
             internal Else(IScope ParentScope, Parser Context, Token ElseToken)
             {
                 _elseToken = ElseToken;

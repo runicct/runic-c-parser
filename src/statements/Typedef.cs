@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -30,35 +32,68 @@ namespace Runic.C
         {
             Type _type;
             public Type Type { get { return _type; } }
+#if NET6_0_OR_GREATER
             Token? _name;
             public Token? Name { get { return _name; } }
+#else
+            Token _name;
+            public Token Name { get { return _name; } }
+#endif
+#if NET6_0_OR_GREATER
             internal Typedef(Type Type, Token? Name)
+#else
+            internal Typedef(Type Type, Token Name)
+#endif
             {
                 _type = Type;
                 _name = Name;
 
             }
+#if NET6_0_OR_GREATER
             internal static Typedef[]? Parse(IScope ParentScope, Parser Context, Token TypedefToken, TokenQueue TokenQueue)
+#else
+            internal static Typedef[] Parse(IScope ParentScope, Parser Context, Token TypedefToken, TokenQueue TokenQueue)
+#endif
             {
                 List<Typedef> results = new List<Typedef>();
+#if NET6_0_OR_GREATER
                 Token? typeToken = TokenQueue.ReadNextToken();
+#else
+                Token typeToken = TokenQueue.ReadNextToken();
+#endif
                 if (typeToken == null)
                 {
                     Context.Error_MissingTypedefType(TypedefToken);
+#if NET6_0_OR_GREATER
                     Token? token = TokenQueue.ReadNextToken();
+#else
+                    Token token = TokenQueue.ReadNextToken();
+#endif
                     while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                     return null;
                 }
+#if NET6_0_OR_GREATER
                 Type? type = Type.Parse(ParentScope, Context, typeToken, TokenQueue);
+#else
+                Type type = Type.Parse(ParentScope, Context, typeToken, TokenQueue);
+#endif
                 if (type == null)
                 {
                     Context.Error_InvalidTypedefType(TypedefToken, typeToken);
+#if NET6_0_OR_GREATER
                     Token? token = TokenQueue.ReadNextToken();
+#else
+                    Token token = TokenQueue.ReadNextToken();
+#endif
                     while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                     return null;
                 }
                 {
+#if NET6_0_OR_GREATER
                     Type.StructOrUnion? structOrUnion = type as Type.StructOrUnion;
+#else
+                    Type.StructOrUnion structOrUnion = type as Type.StructOrUnion;
+#endif
                     if (structOrUnion != null)
                     {
                         while (structOrUnion.Declaration != null && structOrUnion.Declaration != structOrUnion)
@@ -78,7 +113,11 @@ namespace Runic.C
                     {
                         Context.Error_AnonymousFunctionPointerTypeInTypedef(TypedefToken, functionPointer);
                     }
+#if NET6_0_OR_GREATER
                     Token? endStatement = TokenQueue.ReadNextToken();
+#else
+                    Token endStatement = TokenQueue.ReadNextToken();
+#endif
                     if (endStatement == null)
                     {
                         Context.Error_ExpectedSemicolumn(functionPointer.Name);
@@ -86,27 +125,40 @@ namespace Runic.C
                     else if (endStatement.Value != ";")
                     {
                         Context.Error_ExpectedSemicolumn(endStatement);
+#if NET6_0_OR_GREATER
                         Token? token = TokenQueue.ReadNextToken();
+#else
+                        Token token = TokenQueue.ReadNextToken();
+#endif
                         while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                     }
                     return results.ToArray();
                 }
                 else
                 {
-
+#if NET6_0_OR_GREATER
                     Token? name = TokenQueue.ReadNextToken();
-
+#else
+                    Token name = TokenQueue.ReadNextToken();
+#endif
                     results.Add(new Typedef(type, name));
 
                     if (name == null)
                     {
                         Context.Error_MissingTypedefName(TypedefToken);
+#if NET6_0_OR_GREATER
                         Token? token = TokenQueue.ReadNextToken();
+#else
+                        Token token = TokenQueue.ReadNextToken();
+#endif
                         while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                         return null;
                     }
-
+#if NET6_0_OR_GREATER
                     Token? endStatement = TokenQueue.ReadNextToken();
+#else
+                    Token endStatement = TokenQueue.ReadNextToken();
+#endif
                     if (endStatement == null)
                     {
                         Context.Error_ExpectedSemicolumn(name);
@@ -116,7 +168,11 @@ namespace Runic.C
                         while (true)
                         {
                             type = type.Strip();
+#if NET6_0_OR_GREATER
                             Token? nextToken = TokenQueue.ReadNextToken();
+#else
+                            Token nextToken = TokenQueue.ReadNextToken();
+#endif
                             while (true)
                             {
                                 if (nextToken == null)
@@ -151,7 +207,11 @@ namespace Runic.C
                             if (nextToken.Value == ",") { continue; }
                             if (nextToken.Value == ";") { return results.ToArray(); }
                             Context.Error_ExpectedSemicolumn(nextToken);
+#if NET6_0_OR_GREATER
                             Token? token = TokenQueue.ReadNextToken();
+#else
+                            Token token = TokenQueue.ReadNextToken();
+#endif
                             while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                             return results.ToArray();
                         }
@@ -159,7 +219,11 @@ namespace Runic.C
                     else if (endStatement.Value != ";")
                     {
                         Context.Error_ExpectedSemicolumn(endStatement);
+#if NET6_0_OR_GREATER
                         Token? token = TokenQueue.ReadNextToken();
+#else
+                        Token token = TokenQueue.ReadNextToken();
+#endif
                         while (token != null && token.Value != ";") { token = TokenQueue.ReadNextToken(); }
                     }
                     return results.ToArray();

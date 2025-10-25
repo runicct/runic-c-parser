@@ -31,11 +31,25 @@ namespace Runic.C
         {
             Variable _Variable;
             public Variable Variable { get { return _Variable; } }
+
+#if NET6_0_OR_GREATER
             Token? _equal;
+            public Token? Operator {  get { return _equal; } }
             Expression? _initialization;
             public Expression? Initialization {  get { return _initialization; } }
+#else
+            Token _equal;
+            public Token Operator { get { return _equal; } }
+            Expression _initialization;
+            public Expression Initialization {  get { return _initialization; } }
+#endif
+#if NET6_0_OR_GREATER
             internal VariableDeclaration(Variable variable, Token? equal, Expression? initialization)
+#else
+            internal VariableDeclaration(Variable variable, Token equal, Expression initialization)
+#endif
             {
+                _equal = equal;
                 _Variable = variable;
                 _initialization = initialization;
             }

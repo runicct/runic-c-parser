@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -36,11 +38,19 @@ namespace Runic.C
                 {
                     _functionDefinition = FunctionDefinition;
                 }
+#if NET6_0_OR_GREATER
                 internal override Function? GetParentFunction()
+#else
+                internal override Function GetParentFunction()
+#endif
                 {
                     return _functionDefinition;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return null; }
+#else
+                public override IScope GetBreakContinueScope() { return null; }
+#endif
             }
             internal class IfScope : Scope
             {
@@ -59,7 +69,11 @@ namespace Runic.C
                 {
                     _else = Else;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             internal class WhileScope : Scope
             {
@@ -69,7 +83,11 @@ namespace Runic.C
                 {
                     _while = While;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             internal class SwitchScope : Scope
             {
@@ -79,7 +97,11 @@ namespace Runic.C
                 {
                     _switch = Switch;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             internal class DoWhileScope : Scope
             {
@@ -89,7 +111,11 @@ namespace Runic.C
                 {
                     _doWhile = DoWhile;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             internal class ForScope : Scope
             {
@@ -99,7 +125,11 @@ namespace Runic.C
                 {
                     _for = For;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             internal class UnscopedForScope : Scope
             {
@@ -116,7 +146,11 @@ namespace Runic.C
                     if (scope != this) { return true; }
                     return false;
                 }
+#if NET6_0_OR_GREATER
                 public override IScope? GetBreakContinueScope() { return this; }
+#else
+                public override IScope GetBreakContinueScope() { return this; }
+#endif
             }
             Parser _context;
             public Parser Context { get { return _context; } }
@@ -127,13 +161,21 @@ namespace Runic.C
                 _context = Context;
             }
             Dictionary<string, Type> _types = new Dictionary<string, Type>();
+#if NET6_0_OR_GREATER
             public virtual IScope? GetBreakContinueScope()
+#else
+            public virtual IScope GetBreakContinueScope()
+#endif
             {
                 return _parentScope.GetBreakContinueScope();
             }
             internal void AddType(Token Name, Type Type, bool SkipRedefineError = false)
             {
+#if NET6_0_OR_GREATER
                 Type? previousType = null;
+#else
+                Type previousType = null;
+#endif
                 if (_types.TryGetValue(Name.Value, out previousType))
                 {
                     if (!SkipRedefineError)
@@ -143,7 +185,11 @@ namespace Runic.C
                     return;
                 }
                 _types.Add(Name.Value, Type);
+#if NET6_0_OR_GREATER
                 Type.Enum.EnumDeclation? enumType = Type as Type.Enum.EnumDeclation;
+#else
+                Type.Enum.EnumDeclation enumType = Type as Type.Enum.EnumDeclation;
+#endif
                 if (enumType != null)
                 {
                     AddEnumValues(enumType);
@@ -154,7 +200,11 @@ namespace Runic.C
             {
                 foreach (Type.Enum.Member member in Enum.Members)
                 {
+#if NET6_0_OR_GREATER
                     Type.Enum.Member? existingMember = null;
+#else
+                    Type.Enum.Member existingMember = null;
+#endif
                     if (_enumMembers.TryGetValue(member.Name.Value, out existingMember))
                     {
                         // Error
@@ -168,11 +218,20 @@ namespace Runic.C
             Dictionary<string, Variable> _variables = new Dictionary<string, Variable>();
             internal void AddVariable(Variable Variable)
             {
+#if NET6_0_OR_GREATER
                 Variable? previousVaraible = null;
+#else
+                Variable previousVaraible = null;
+#endif
                 if (_variables.TryGetValue(Variable.Name.Value, out previousVaraible))
                 {
+#if NET6_0_OR_GREATER
                     GlobalVariable? globalVariable = Variable as GlobalVariable;
                     GlobalVariable? previousGlobalVariable = previousVaraible as GlobalVariable;
+#else
+                    GlobalVariable globalVariable = Variable as GlobalVariable;
+                    GlobalVariable previousGlobalVariable = previousVaraible as GlobalVariable;
+#endif
                     if (globalVariable != null && previousGlobalVariable != null)
                     {
                         if (previousGlobalVariable.Extern && !globalVariable.Extern)
@@ -195,19 +254,35 @@ namespace Runic.C
             Dictionary<string, Function> _functions = new Dictionary<string, Function>();
             internal void AddFunction(Function Function)
             {
+#if NET6_0_OR_GREATER
                 Function? previousFunction = null;
+#else
+                Function previousFunction = null;
+#endif
                 if (_functions.TryGetValue(Function.Name.Value, out previousFunction))
                 {
                     return;
                 }
                 _functions.Add(Function.Name.Value, Function);
             }
+#if NET6_0_OR_GREATER
             internal virtual Function? GetParentFunction()
+#else
+            internal virtual Function GetParentFunction()
+#endif
             {
+#if NET6_0_OR_GREATER
                 IScope? parentScope = ParentScope;
+#else
+                IScope parentScope = ParentScope;
+#endif
                 while (parentScope != null)
                 {
+#if NET6_0_OR_GREATER
                     Scope? typedParentScope = _parentScope as Scope;
+#else
+                    Scope typedParentScope = _parentScope as Scope;
+#endif
                     if (typedParentScope != null)
                     {
                         return typedParentScope.GetParentFunction();
@@ -219,10 +294,22 @@ namespace Runic.C
                 }
                 return null;
             }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _parentScope; } }
+#else
+            public IScope ParentScope { get { return _parentScope; } }
+#endif
+#if NET6_0_OR_GREATER
             public Type? ResolveType(string Name)
+#else
+            public Type ResolveType(string Name)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Type? type = null;
+#else
+                Type type = null;
+#endif
                 if (_types.TryGetValue(Name, out type))
                 {
                     return type;
@@ -233,9 +320,17 @@ namespace Runic.C
                 }
                 return null;
             }
+#if NET6_0_OR_GREATER
             public virtual Variable? ResolveVariable(string Name)
+#else
+            public virtual Variable ResolveVariable(string Name)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Variable? varaible = null;
+#else
+                Variable varaible = null;
+#endif
                 if (_variables.TryGetValue(Name, out varaible))
                 {
                     return varaible;
@@ -246,9 +341,17 @@ namespace Runic.C
                 }
                 return null;
             }
+#if NET6_0_OR_GREATER
             public Type.Enum.Member? ResolveEnumMember(string Name)
+#else
+            public Type.Enum.Member ResolveEnumMember(string Name)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Type.Enum.Member? member = null;
+#else
+                Type.Enum.Member member = null;
+#endif
                 if (_enumMembers.TryGetValue(Name, out member))
                 {
                     return member;
@@ -259,9 +362,17 @@ namespace Runic.C
                 }
                 return null;
             }
+#if NET6_0_OR_GREATER
             public Function? ResolveFunction(string Name)
+#else
+            public Function ResolveFunction(string Name)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Function? function = null;
+#else
+                Function function = null;
+#endif
                 if (_functions.TryGetValue(Name, out function))
                 {
                     return function;

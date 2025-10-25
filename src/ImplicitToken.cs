@@ -28,8 +28,11 @@ namespace Runic.C
     {
         internal class ImplicitToken : Token
         {
-
+#if NET6_0_OR_GREATER
             public ImplicitToken(int startLine, int startColumn, int endLine, int endColumn, string? file, string? value) : base(startLine, startColumn, endLine, endColumn, file, value)
+#else
+            public ImplicitToken(int startLine, int startColumn, int endLine, int endColumn, string file, string value) : base(startLine, startColumn, endLine, endColumn, file, value)
+#endif
             {
             }
         }

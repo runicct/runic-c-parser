@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -30,7 +32,11 @@ namespace Runic.C
         {
             public class Static : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal Static(Token? name) : base(name) { }
+#else
+                internal Static(Token name) : base(name) { }
+#endif
                 public override string ToString()
                 {
                     return "static";
@@ -38,7 +44,11 @@ namespace Runic.C
             }
             public class Extern : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal Extern(Token? name) : base(name) { }
+#else
+                internal Extern(Token name) : base(name) { }
+#endif
                 public override string ToString()
                 {
                     return "extern";
@@ -46,7 +56,11 @@ namespace Runic.C
             }
             public class DllExport : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal DllExport(Token? name) : base(name) { }
+#else
+                internal DllExport(Token name) : base(name) { }
+#endif
                 public override string ToString()
                 {
                     return "__declspec(dllexport)";
@@ -54,7 +68,11 @@ namespace Runic.C
             }
             public class DllImport : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal DllImport(Token? name) : base(name) { }
+#else
+                internal DllImport(Token name) : base(name) { }
+#endif
                 public override string ToString()
                 {
                     return "__declspec(dllimport)";
@@ -62,26 +80,51 @@ namespace Runic.C
             }
             public class Deprecated : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal Deprecated(Token? name) : base(name) { }
+#else
+                internal Deprecated(Token name) : base(name) { }
+#endif
             }
             public class NoInline : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal NoInline(Token? name) : base(name) { }
+#else
+                internal NoInline(Token name) : base(name) { }
+#endif
             }
             public class NoReturn : Attribute
             {
+#if NET6_0_OR_GREATER
                 internal NoReturn(Token? name) : base(name) { }
+#else
+                internal NoReturn(Token name) : base(name) { }
+#endif
             }
+#if NET6_0_OR_GREATER
             Token? _name;
             public Token? Name { get { return _name; } }
+#else
+            Token _name;
+            public Token Name { get { return _name; } }
+#endif
+#if NET6_0_OR_GREATER
             internal Attribute(Token? name)
+#else
+            internal Attribute(Token name)
+#endif
             {
                 _name = name;
             }
             internal static Attribute[] Parse(Parser Context, TokenQueue tokenQueue)
             {
                 List<Attribute> attributes = new List<Attribute>();
+#if NET6_0_OR_GREATER
                 Token? token = tokenQueue.ReadNextToken();
+#else
+                Token token = tokenQueue.ReadNextToken();
+#endif
                 while (true)
                 {
                     if (token == null)
@@ -111,7 +154,11 @@ namespace Runic.C
                             Context.Error_InvalidFunctionAttribute(declspecToken, null);
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Token? attributeValue = tokenQueue.ReadNextToken();
+#else
+                        Token attributeValue = tokenQueue.ReadNextToken();
+#endif
                         if (attributeValue == null)
                         {
                             Context.Error_InvalidFunctionAttribute(declspecToken, null);

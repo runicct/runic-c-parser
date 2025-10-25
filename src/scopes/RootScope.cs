@@ -33,12 +33,16 @@ namespace Runic.C
 
             }
             Expression.Nullptr _null;
-            public Expression.Nullptr DefineNULL(Token token)
+            internal Expression.Nullptr DefineNULL(Token token)
             {
                 if (_null == null) { _null = new Expression.Nullptr(token); }
                 return _null;
             }
+#if NET6_0_OR_GREATER
             public override Variable? ResolveVariable(string Name)
+#else
+            public override Variable ResolveVariable(string Name)
+#endif
             {
                 if (_null != null && Name == "NULL") { return _null; }
                 return base.ResolveVariable(Name);

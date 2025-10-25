@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -46,7 +48,11 @@ namespace Runic.C
                 {
                     internal Member[] _members;
                     public Member[] Members { get { return _members; } }
+#if NET6_0_OR_GREATER
                     public EnumDeclation(Attribute[] attributes, IScope parentScope, Token enumToken, Token? name) : base(attributes, parentScope, enumToken, name)
+#else
+                    public EnumDeclation(Attribute[] attributes, IScope parentScope, Token enumToken, Token name) : base(attributes, parentScope, enumToken, name)
+#endif
                     {
 
                     }
@@ -54,12 +60,17 @@ namespace Runic.C
 
                 internal class EnumReference : Enum
                 {
+#if NET6_0_OR_GREATER
                     public EnumReference(Attribute[] attributes, IScope parentScope, Token enumToken, Token? name) : base(attributes, parentScope, enumToken, name)
+#else
+                    public EnumReference(Attribute[] attributes, IScope parentScope, Token enumToken, Token name) : base(attributes, parentScope, enumToken, name)
+#endif
                     {
 
                     }
                 }
                 IScope _parent;
+#if NET6_0_OR_GREATER
                 Token? _name;
                 public Token? Name { get { return _name; } }
 
@@ -70,18 +81,44 @@ namespace Runic.C
                 public IScope? GetBreakContinueScope() { return null; }
 
                 public IScope? ParentScope { get { return _parent; } }
+#else
+                Token _name;
+                public Token Name { get { return _name; } }
 
+                public Type ResolveType(string Name) { return _parent.ResolveType(Name); }
+                public Variable ResolveVariable(string Name) { return _parent.ResolveVariable(Name); }
+                public Function ResolveFunction(string Name) { return _parent.ResolveFunction(Name); }
+                public Member ResolveEnumMember(string Name) { return _parent.ResolveEnumMember(Name); }
+                public IScope GetBreakContinueScope() { return null; }
+
+                public IScope ParentScope { get { return _parent; } }
+#endif
+
+#if NET6_0_OR_GREATER
                 public Enum(Attribute[] attributes, IScope parentScope, Token enumToken, Token? name)
+#else
+                public Enum(Attribute[] attributes, IScope parentScope, Token enumToken, Token name)
+#endif
                 {
                     _parent = parentScope;
                     _name = name;
                 }
+#if NET6_0_OR_GREATER
                 internal static Enum? Parse(IScope ParentScope, Parser Context, Token EnumToken, TokenQueue TokenQueue)
+#else
+                internal static Enum Parse(IScope ParentScope, Parser Context, Token EnumToken, TokenQueue TokenQueue)
+#endif
                 {
+#if NET6_0_OR_GREATER
                     Expression? previousValue = null;
-                    ulong counter = 0;
                     Token? name = null;
                     Token? token = TokenQueue.PeekToken();
+#else
+                    Expression previousValue = null;
+                    Token name = null;
+                    Token token = TokenQueue.PeekToken();
+#endif
+                    ulong counter = 0;
                     if (token == null)
                     {
                         Context.Error_IncompleteDeclaration(EnumToken);
@@ -118,7 +155,11 @@ namespace Runic.C
                     EnumDeclation pendingEnum = new EnumDeclation(new Attribute[0], ParentScope, EnumToken, name);
                     while (true)
                     {
+#if NET6_0_OR_GREATER
                         Token? memberName = TokenQueue.ReadNextToken();
+#else
+                        Token memberName = TokenQueue.ReadNextToken();
+#endif
                         if (memberName == null)
                         {
                             pendingEnum._members = enumMembers.ToArray();
@@ -127,7 +168,11 @@ namespace Runic.C
                         }
                         if (!Identifier.IsValid(memberName, Context.StandardRevision)) { Context.Error_InvalidIdentifier(memberName); }
 
+#if NET6_0_OR_GREATER
                         Token? nextToken = TokenQueue.ReadNextToken();
+#else
+                        Token nextToken = TokenQueue.ReadNextToken();
+#endif
                         if (nextToken == null)
                         {
                             pendingEnum._members = enumMembers.ToArray();
@@ -136,7 +181,11 @@ namespace Runic.C
                         }
                         if (nextToken.Value == "=")
                         {
+#if NET6_0_OR_GREATER
                             Expression? value = Expression.Parse(pendingEnum, Context, TokenQueue);
+#else
+                            Expression value = Expression.Parse(pendingEnum, Context, TokenQueue);
+#endif
                             previousValue = value;
                             counter = 0;
                             if (value != null)

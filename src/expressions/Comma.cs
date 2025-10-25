@@ -34,9 +34,14 @@ namespace Runic.C
                 public Expression Left { get { return _left; } }
                 Expression _right;
                 public Expression Right { get { return _right; } }
-                Token? _op;
+#if NET6_0_OR_GREATER
                 public override Type? Type { get { return _right.Type; } }
-                internal Comma(Token? op, Expression left, Expression right)
+#else
+                public override Type Type { get { return _right.Type; } }
+#endif
+                Token _op;
+                public Token Operator { get { return _op; } }
+                internal Comma(Token op, Expression left, Expression right)
                 {
                     _left = left;
                     _right = right;

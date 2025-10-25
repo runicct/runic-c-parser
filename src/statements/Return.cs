@@ -28,22 +28,31 @@ namespace Runic.C
     {
         public class Return : Statement
         {
-
-            Expression? _returnValue;
-            public Expression? ReturnValue { get { return _returnValue; } }
+#if NET6_0_OR_GREATER
+            Expression? _value;
+            public Expression? Value { get { return _value; } }
+#else
+            Expression _value;
+            public Expression Value { get { return _value; } }
+#endif
             Token _returnToken;
-            internal Return(IScope ParentScope, Parser Context, Token ReturnToken, Expression? ReturnValue)
+            public Token Keyword { get { return _returnToken; } }
+#if NET6_0_OR_GREATER
+            internal Return(IScope parentScope, Parser context, Token returnToken, Expression? returnValue)
+#else
+            internal Return(IScope parentScope, Parser context, Token returnToken, Expression returnValue)
+#endif
             {
-                _returnToken = ReturnToken;
-                _returnValue = ReturnValue;
+                _returnToken = returnToken;
+                _value = returnValue;
             }
             public override string ToString()
             {
-                if (_returnValue == null)
+                if (_value == null)
                 {
                     return "return;";
                 }
-                return "return " + _returnValue.ToString();
+                return "return " + _value.ToString();
             }
         }
     }

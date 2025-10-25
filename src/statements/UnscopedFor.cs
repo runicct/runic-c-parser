@@ -33,6 +33,7 @@ namespace Runic.C
         {
             Scope.UnscopedForScope _body;
             internal Scope.UnscopedForScope Body { get { return _body; } }
+#if NET6_0_OR_GREATER
             Expression? _condition;
             public Expression? Condition { get { return _condition; } }
             Expression? _increment;
@@ -43,6 +44,18 @@ namespace Runic.C
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#else
+            Expression _condition;
+            public Expression Condition { get { return _condition; } }
+            Expression _increment;
+            public Expression Increment { get { return _increment; } }
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
             VariableDeclaration[] _variablesDeclarations;
             public VariableDeclaration[] VariableDeclarations { get { return _variablesDeclarations; } }
             Token _forToken;

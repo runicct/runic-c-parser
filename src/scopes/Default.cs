@@ -29,6 +29,7 @@ namespace Runic.C
         public class Default : Statement
         {
             Token _defaultToken;
+            public Token Keyword { get { return _defaultToken; } }
             Token _columnToken;
             Switch _switch;
             public Switch Switch { get { return _switch; } }

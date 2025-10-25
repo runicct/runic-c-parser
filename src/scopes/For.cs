@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -30,6 +32,10 @@ namespace Runic.C
         {
             Scope _body;
             internal Scope Body { get { return _body; } }
+
+#if NET6_0_OR_GREATER
+            Expression? _initialization;
+            public Expression? Initialization { get { return _initialization; } }
             Expression? _condition;
             public Expression? Condition { get { return _condition; } }
             Expression? _increment;
@@ -40,11 +46,24 @@ namespace Runic.C
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#else
+            Expression _initialization;
+            public Expression Initialization { get { return _initialization; } }
+            Expression _condition;
+            public Expression Condition { get { return _condition; } }
+            Expression _increment;
+            public Expression Increment { get { return _increment; } }
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
             VariableDeclaration[] _variablesDeclarations;
             public VariableDeclaration[] VariableDeclarations { get { return _variablesDeclarations; } }
-            Expression? _initialization;
-            public Expression? Initialization { get { return _initialization; } }
             Token _forToken;
+            public Token Keyword { get { return _forToken; } }
             internal For(IScope ParentScope, Parser Context, Token ForToken)
             {
                 _forToken = ForToken;
@@ -55,11 +74,20 @@ namespace Runic.C
             {
                 return "for ( ;" + (_condition == null ? "" : _condition.ToString()) + "; " + (_increment == null ? "" : _increment.ToString()) +") {";
             }
+#if NET6_0_OR_GREATER
             internal static For? ParseFor(IScope ParentScope, Parser Context, Token ForToken, TokenQueue TokenQueue)
+#else
+            internal static For ParseFor(IScope ParentScope, Parser Context, Token ForToken, TokenQueue TokenQueue)
+#endif
             {
                 For forLoop = new For(ParentScope, Context, ForToken);
+#if NET6_0_OR_GREATER
                 Function? parentFunction = forLoop.Body.GetParentFunction();
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Function parentFunction = forLoop.Body.GetParentFunction();
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null)
                 {
                     Context.Error_IncompleteStatement(ForToken);
@@ -81,7 +109,11 @@ namespace Runic.C
                     return null;
                 }
                 List<VariableDeclaration> variables = new List<VariableDeclaration>();
+#if NET6_0_OR_GREATER
                 Type? type = Type.Parse(ParentScope, Context, token, TokenQueue);
+#else
+                Type type = Type.Parse(ParentScope, Context, token, TokenQueue);
+#endif
                 if (token.Value != ";")
                 {
                     if (type == null)
@@ -115,7 +147,11 @@ namespace Runic.C
                     {
                         while (true)
                         {
+#if NET6_0_OR_GREATER
                             Token? variableName = TokenQueue.ReadNextToken();
+#else
+                            Token variableName = TokenQueue.ReadNextToken();
+#endif
                             if (variableName == null)
                             {
                                 Context.Error_IncompleteStatement(ForToken);
@@ -141,7 +177,11 @@ namespace Runic.C
                                 case "=":
                                     {
                                         Token equal = token;
+#if NET6_0_OR_GREATER
                                         Expression? initialization = Expression.Parse(ParentScope, Context, TokenQueue);
+#else
+                                        Expression initialization = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
                                         if (Identifier.IsValid(variableName, Context.StandardRevision))
                                         {
                                             LocalVariable variable = new LocalVariable(new Attribute[0], type, variableName, parentFunction, parentFunction.GetNextLocalIndex());
@@ -227,7 +267,7 @@ namespace Runic.C
                 {
                     if (forLoop._increment != null)
                     {
-                        // No need to overwheelm the users with two errors so only report it if we have extra token
+                        // No need to overwhelm the users with two errors so only report it if we have extra token
                     }
                     while (token != null && token.Value != ")")
                     {

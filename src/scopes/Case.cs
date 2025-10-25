@@ -31,6 +31,7 @@ namespace Runic.C
             Expression _constant;
             public Expression Constant { get { return _constant; } }
             Token _caseToken;
+            public Token Keyword { get { return _caseToken; } }
             Token _columnToken;
             Switch _switch;
             public Switch Switch { get { return _switch; } }

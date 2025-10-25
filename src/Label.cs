@@ -28,13 +28,27 @@ namespace Runic.C
     {
         public class Label : Statement
         {
+#if NET6_0_OR_GREATER
             Token? _name;
             public Token? Name { get { return _name; } }
             ulong _index;
             public ulong Index { get { return _index; } }
             Function? _function;
             public Function? function { get { return _function; } }
+#else
+            Token _name;
+            public Token Name { get { return _name; } }
+            ulong _index;
+            public ulong Index { get { return _index; } }
+            Function _function;
+            public Function function { get { return _function; } }
+#endif
+
+#if NET6_0_OR_GREATER
             internal Label(Token? Name, Function? Function, ulong Index)
+#else
+            internal Label(Token Name, Function Function, ulong Index)
+#endif
             {
                 _name = Name;
                 _function = Function;

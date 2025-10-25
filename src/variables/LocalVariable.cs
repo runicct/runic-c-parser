@@ -28,18 +28,16 @@ namespace Runic.C
     {
         public class LocalVariable : Variable
         {
-            Type _Type;
-            public Type Type { get { return _Type; } }
-            Token? _Name;
-            public Token? Name { get { return _Name; } }
             Function _function;
             public Function Function { get { return _function; } }
             ulong _index;
             public ulong Index { get { return _index; } }
+#if NET6_0_OR_GREATER
             internal LocalVariable(Attribute[] attributes, Type Type, Token? Name, Function Function, ulong Index) : base(attributes, Type, Name)
+#else
+            internal LocalVariable(Attribute[] attributes, Type Type, Token Name, Function Function, ulong Index) : base(attributes, Type, Name)
+#endif
             {
-                _Type = Type;
-                _Name = Name;
                 _function = Function;
                 _index = Index;
             }

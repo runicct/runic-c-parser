@@ -28,30 +28,49 @@ namespace Runic.C
     {
         public class Switch : Scope.Enter, IScope
         {
+            Token _switchToken;
+            public Token Keyword { get { return _switchToken; } }
             Scope _body;
             internal Scope Body { get { return _body; } }
-
             Expression _value;
             public Expression Value { get { return _value; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
             public Variable? ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
-            internal Switch(IScope ParentScope, Parser Context, Token SwitchToken, Expression Value)
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
+            internal Switch(IScope parentScope, Parser context, Token switchToken, Expression value)
             {
-                _body = new Scope.SwitchScope(ParentScope, Context, this);
+                _body = new Scope.SwitchScope(parentScope, context, this);
                 _scope = _body;
-                _value = Value;
+                _value = value;
+                _switchToken = switchToken;
             }
             public override string ToString()
             {
                 return "switch (" + _value.ToString() + ") {";
             }
+#if NET6_0_OR_GREATER
             internal static Switch? ParseSwitch(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#else
+            internal static Switch ParseSwitch(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null)
                 {
                     Context.Error_IncompleteStatement(IfToken);
@@ -65,8 +84,11 @@ namespace Runic.C
                     return null;
                 }
 
+#if NET6_0_OR_GREATER
                 Expression? value = Expression.Parse(ParentScope, Context, TokenQueue);
-
+#else
+                Expression value = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
                 token = TokenQueue.ReadNextToken();
                 if (token == null)
                 {

@@ -34,10 +34,16 @@ namespace Runic.C
                 public Expression Left { get { return _left; } }
                 Expression _right;
                 public Expression Right { get { return _right; } }
-                Token? _operator;
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+#if NET6_0_OR_GREATER
                 Type _type;
                 public override Type? Type { get { return _type; } }
-                internal LogicalOr(Token? op, Expression left, Expression right)
+#else
+                Type _type;
+                public override Type Type { get { return _type; } }
+#endif
+                internal LogicalOr(Token op, Expression left, Expression right)
                 {
                     _type = new Type.Int(op);
                     _left = left;

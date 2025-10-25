@@ -28,30 +28,50 @@ namespace Runic.C
     {
         public class While : Scope.Enter, IScope
         {
+            Token _whileToken;
+            public Token WhileToken { get { return _whileToken; } }
             Scope _body;
             internal Scope Body { get { return _body; } }
 
             Expression _condition;
             public Expression Condition { get { return _condition; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
             public Variable? ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
-            internal While(IScope ParentScope, Parser Context, Token WhileToken, Expression Condition)
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
+            internal While(IScope parentScope, Parser context, Token whileToken, Expression condition)
             {
-                _body = new Scope.WhileScope(ParentScope, Context, this);
+                _body = new Scope.WhileScope(parentScope, context, this);
                 _scope = _body;
-                _condition = Condition;
+                _condition = condition;
+                _whileToken = whileToken;
             }
             public override string ToString()
             {
                 return "while (" + _condition.ToString() + ") {";
             }
+#if NET6_0_OR_GREATER
             internal static While? ParseWhile(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#else
+            internal static While ParseWhile(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null)
                 {
                     Context.Error_IncompleteStatement(IfToken);
@@ -65,8 +85,12 @@ namespace Runic.C
                     return null;
                 }
 
+#if NET6_0_OR_GREATER
                 Expression? condition = Expression.Parse(ParentScope, Context, TokenQueue);
-
+#else
+                Expression condition = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
+                if (condition == null) { condition = new Expression.Constant(new Token[] { new ImplicitToken(token.StartLine, token.StartColumn, token.EndLine, token.EndColumn, token.File, "0") }); }
                 token = TokenQueue.ReadNextToken();
                 if (token == null)
                 {

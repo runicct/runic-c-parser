@@ -32,8 +32,9 @@ namespace Runic.C
             {
                 Expression _value;
                 public Expression Value { get { return _value; } }
-                Token? _operator;
-                internal Not(Token? op, Expression value)
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+                internal Not(Token op, Expression value)
                 {
                     _value = value;
                     _operator = op;

@@ -28,16 +28,14 @@ namespace Runic.C
     {
         public class GlobalVariable : Variable
         {
-            Type _Type;
-            public Type Type { get { return _Type; } }
-            Token? _name;
-            public Token? Name { get { return _name; } }
             ulong _index;
             public ulong Index { get { return _index; } }
+#if NET6_0_OR_GREATER
             internal GlobalVariable(Attribute[] attributes, Type Type, Token? Name, ulong Index) : base(attributes, Type, Name)
+#else
+            internal GlobalVariable(Attribute[] attributes, Type Type, Token Name, ulong Index) : base(attributes, Type, Name)
+#endif
             {
-                _Type = Type;
-                _name = Name;
                 _index = Index;
             }
         }

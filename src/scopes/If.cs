@@ -34,12 +34,22 @@ namespace Runic.C
             Expression _condition;
             public Expression Condition { get { return _condition; } }
             Token _ifToken;
+            public Token Keyword { get { return _ifToken; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
             public Variable? ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
             internal If(IScope ParentScope, Parser Context, Token IfToken, Expression Condition)
             {
                 _ifToken = IfToken;
@@ -51,9 +61,17 @@ namespace Runic.C
             {
                 return "if (" + _condition.ToString() + ") {";
             }
+#if NET6_0_OR_GREATER
             internal static If? ParseIf(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#else
+            internal static If ParseIf(IScope ParentScope, Parser Context, Token IfToken, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? token = TokenQueue.ReadNextToken();
+#else
+                Token token = TokenQueue.ReadNextToken();
+#endif
                 if (token == null)
                 {
                     Context.Error_IncompleteStatement(IfToken);
@@ -67,8 +85,11 @@ namespace Runic.C
                     return null;
                 }
 
+#if NET6_0_OR_GREATER
                 Expression? condition = Expression.Parse(ParentScope, Context, TokenQueue);
-
+#else
+                Expression condition = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
                 token = TokenQueue.ReadNextToken();
                 if (token == null)
                 {

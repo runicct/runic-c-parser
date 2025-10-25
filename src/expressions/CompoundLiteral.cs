@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
 using System.Text;
 
 namespace Runic.C
@@ -34,7 +35,7 @@ namespace Runic.C
             {
                 Dictionary<string, Expression> _values;
                 public Dictionary<string, Expression> Values { get { return _values; } }
-                Token? _op;
+                Token _op;
                 public CompoundLiteralsFields(Token op, Dictionary<string, Expression> values) { _op = op; _values = values; }
                 public override string ToString()
                 {
@@ -55,9 +56,18 @@ namespace Runic.C
             {
                 Expression[] _values;
                 public Expression[] Values { get { return _values; } }
+#if NET6_0_OR_GREATER
                 Token? _op;
                 internal Token? Op { get { return _op; } }
+#else
+                Token _op;
+                internal Token Op { get { return _op; } }
+#endif
+#if NET6_0_OR_GREATER
+                public CompoundLiteralsList(Token? op, Expression[] values) { _op = op; _values = values; }
+#else
                 public CompoundLiteralsList(Token op, Expression[] values) { _op = op; _values = values; }
+#endif
                 public override string ToString()
                 {
                     StringBuilder builder = new StringBuilder();
@@ -84,7 +94,11 @@ namespace Runic.C
                     _fields = initialization;
                     _type = type;
                 }
+#if NET6_0_OR_GREATER
                 static Type.StructOrUnion? ResolveType(Type.StructOrUnion? structOrUnion)
+#else
+                static Type.StructOrUnion ResolveType(Type.StructOrUnion structOrUnion)
+#endif
                 {
                     if (structOrUnion == null) { return null; }
                     while (structOrUnion.Declaration != null && structOrUnion.Declaration != structOrUnion)
@@ -93,8 +107,13 @@ namespace Runic.C
                     }
                     if (structOrUnion.Declaration == null && structOrUnion.Name != null && structOrUnion.ParentScope != null)
                     {
+#if NET6_0_OR_GREATER
                         IScope? scope = structOrUnion.ParentScope;
                         Type? type = scope.ResolveType(structOrUnion.Name.Value);
+#else
+                        IScope scope = structOrUnion.ParentScope;
+                        Type type = scope.ResolveType(structOrUnion.Name.Value);
+#endif
                         if (type == null) { return null; }
                         return type as Type.StructOrUnion;
                     }
@@ -106,7 +125,11 @@ namespace Runic.C
                 }
                 internal static CompoundLiteralsStruct Create(Parser context, CompoundLiteralsList compoundLiteralsList, Type.StructOrUnion type, bool final, ref int listIndex)
                 {
+#if NET6_0_OR_GREATER
                     Type.StructOrUnion? structOrUnionTypeDefinition = ResolveType(type);
+#else
+                    Type.StructOrUnion structOrUnionTypeDefinition = ResolveType(type);
+#endif
                     if (structOrUnionTypeDefinition == null)
                     {
                         context.Error_UseOfIncompleteTypeInFieldAccess(compoundLiteralsList.Op, type);
@@ -123,9 +146,15 @@ namespace Runic.C
                             if (type.Fields != null && type.Fields.Length > 0)
                             {
                                 Expression expression = compoundLiteralsList.Values[listIndex];
+#if NET6_0_OR_GREATER
                                 CompoundLiteralsList? compoundList = expression as CompoundLiteralsList;
                                 CompoundLiteralsFields? compoundFields = expression as CompoundLiteralsFields;
                                 Type.StructOrUnion? structType = type.Fields[0].Type as Type.StructOrUnion;
+#else
+                                CompoundLiteralsList compoundList = expression as CompoundLiteralsList;
+                                CompoundLiteralsFields compoundFields = expression as CompoundLiteralsFields;
+                                Type.StructOrUnion structType = type.Fields[0].Type as Type.StructOrUnion;
+#endif
 
                                 if (compoundList != null)
                                 {
@@ -167,9 +196,15 @@ namespace Runic.C
                                 break;
                             }
                             Expression expression = compoundLiteralsList.Values[listIndex];
+#if NET6_0_OR_GREATER
                             CompoundLiteralsList? compoundList = expression as CompoundLiteralsList;
                             CompoundLiteralsFields? compoundFields = expression as CompoundLiteralsFields;
                             Type.StructOrUnion? structType = type.Fields[fieldIndex].Type as Type.StructOrUnion;
+#else
+                            CompoundLiteralsList compoundList = expression as CompoundLiteralsList;
+                            CompoundLiteralsFields compoundFields = expression as CompoundLiteralsFields;
+                            Type.StructOrUnion structType = type.Fields[fieldIndex].Type as Type.StructOrUnion;
+#endif
                             if (compoundList != null)
                             {
                                 if (structType == null) { /* Error */ }

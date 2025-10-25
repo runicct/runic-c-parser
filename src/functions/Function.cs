@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser
@@ -51,15 +53,23 @@ namespace Runic.C
             }
             ulong _labelIndex = 0;
             Dictionary<string, Label> _labels = new Dictionary<string, Label>();
+#if NET6_0_OR_GREATER
             internal Label GetOrDeclareLabel(Token? name)
+#else
+            internal Label GetOrDeclareLabel(Token name)
+#endif
             {
                 lock (this)
                 {
-                    if (name == null)
+                    if ((name == null) || (name.Value == null))
                     {
                         return new Label(null, this, _labelIndex++);
                     }
-                    Label label = null;
+#if NET6_0_OR_GREATER
+                    Label? label;
+#else
+                    Label label;
+#endif
                     if (_labels.TryGetValue(name.Value, out label))
                     {
                         return label;

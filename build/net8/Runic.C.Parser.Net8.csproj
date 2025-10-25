@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Runic.C.Parser</AssemblyName>
+    <RootNamespace>Runic.C.Parser</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\Identifier.cs" Link="Identifier.cs" />
+    <Compile Include="..\..\src\ImplicitToken.cs" Link="ImplicitToken.cs" />
+    <Compile Include="..\..\src\Label.cs" Link="Label.cs" />
+    <Compile Include="..\..\src\OperatorPrecedence.cs" Link="OperatorPrecedence.cs" />
+    <Compile Include="..\..\src\Parser.cs" Link="Parser.cs" />
+    <Compile Include="..\..\src\expressions/Add.cs" Link="/expressions/Add.cs" />
+    <Compile Include="..\..\src\expressions/And.cs" Link="/expressions/And.cs" />
+    <Compile Include="..\..\src\expressions/Assignment.cs" Link="/expressions/Assignment.cs" />
+    <Compile Include="..\..\src\expressions/Call.cs" Link="/expressions/Call.cs" />
+    <Compile Include="..\..\src\expressions/Cast.cs" Link="/expressions/Cast.cs" />
+    <Compile Include="..\..\src\expressions/Comma.cs" Link="/expressions/Comma.cs" />
+    <Compile Include="..\..\src\expressions/Comparison.cs" Link="/expressions/Comparison.cs" />
+    <Compile Include="..\..\src\expressions/CompoundLiteral.cs" Link="/expressions/CompoundLiteral.cs" />
+    <Compile Include="..\..\src\expressions/Constant.cs" Link="/expressions/Constant.cs" />
+    <Compile Include="..\..\src\expressions/Decrement.cs" Link="/expressions/Decrement.cs" />
+    <Compile Include="..\..\src\expressions/Dereference.cs" Link="/expressions/Dereference.cs" />
+    <Compile Include="..\..\src\expressions/Div.cs" Link="/expressions/Div.cs" />
+    <Compile Include="..\..\src\expressions/EnumMemberUse.cs" Link="/expressions/EnumMemberUse.cs" />
+    <Compile Include="..\..\src\expressions/Expression.cs" Link="/expressions/Expression.cs" />
+    <Compile Include="..\..\src\expressions/FunctionReference.cs" Link="/expressions/FunctionReference.cs" />
+    <Compile Include="..\..\src\expressions/Increment.cs" Link="/expressions/Increment.cs" />
+    <Compile Include="..\..\src\expressions/Indexing.cs" Link="/expressions/Indexing.cs" />
+    <Compile Include="..\..\src\expressions/IndirectCall.cs" Link="/expressions/IndirectCall.cs" />
+    <Compile Include="..\..\src\expressions/LogicalAnd.cs" Link="/expressions/LogicalAnd.cs" />
+    <Compile Include="..\..\src\expressions/LogicalOr.cs" Link="/expressions/LogicalOr.cs" />
+    <Compile Include="..\..\src\expressions/Mul.cs" Link="/expressions/Mul.cs" />
+    <Compile Include="..\..\src\expressions/Not.cs" Link="/expressions/Not.cs" />
+    <Compile Include="..\..\src\expressions/Nullptr.cs" Link="/expressions/Nullptr.cs" />
+    <Compile Include="..\..\src\expressions/Or.cs" Link="/expressions/Or.cs" />
+    <Compile Include="..\..\src\expressions/Reference.cs" Link="/expressions/Reference.cs" />
+    <Compile Include="..\..\src\expressions/SizeOf.cs" Link="/expressions/SizeOf.cs" />
+    <Compile Include="..\..\src\expressions/Sub.cs" Link="/expressions/Sub.cs" />
+    <Compile Include="..\..\src\expressions/VariableUse.cs" Link="/expressions/VariableUse.cs" />
+    <Compile Include="..\..\src\functions/Function.cs" Link="/functions/Function.cs" />
+    <Compile Include="..\..\src\functions/FunctionDeclaration.cs" Link="/functions/FunctionDeclaration.cs" />
+    <Compile Include="..\..\src\functions/FunctionDefinition.cs" Link="/functions/FunctionDefinition.cs" />
+    <Compile Include="..\..\src\functions/Intrinsic.cs" Link="/functions/Intrinsic.cs" />
+    <Compile Include="..\..\src\scopes/Break.cs" Link="/scopes/Break.cs" />
+    <Compile Include="..\..\src\scopes/Case.cs" Link="/scopes/Case.cs" />
+    <Compile Include="..\..\src\scopes/Default.cs" Link="/scopes/Default.cs" />
+    <Compile Include="..\..\src\scopes/DoWhile.cs" Link="/scopes/DoWhile.cs" />
+    <Compile Include="..\..\src\scopes/Else.cs" Link="/scopes/Else.cs" />
+    <Compile Include="..\..\src\scopes/For.cs" Link="/scopes/For.cs" />
+    <Compile Include="..\..\src\scopes/If.cs" Link="/scopes/If.cs" />
+    <Compile Include="..\..\src\scopes/IScope.cs" Link="/scopes/IScope.cs" />
+    <Compile Include="..\..\src\scopes/RootScope.cs" Link="/scopes/RootScope.cs" />
+    <Compile Include="..\..\src\scopes/Scope.cs" Link="/scopes/Scope.cs" />
+    <Compile Include="..\..\src\scopes/Switch.cs" Link="/scopes/Switch.cs" />
+    <Compile Include="..\..\src\scopes/While.cs" Link="/scopes/While.cs" />
+    <Compile Include="..\..\src\statements/Attributes.cs" Link="/statements/Attributes.cs" />
+    <Compile Include="..\..\src\statements/Empty.cs" Link="/statements/Empty.cs" />
+    <Compile Include="..\..\src\statements/EmptyWhile.cs" Link="/statements/EmptyWhile.cs" />
+    <Compile Include="..\..\src\statements/Return.cs" Link="/statements/Return.cs" />
+    <Compile Include="..\..\src\statements/Typedef.cs" Link="/statements/Typedef.cs" />
+    <Compile Include="..\..\src\statements/UnscopedDo.cs" Link="/statements/UnscopedDo.cs" />
+    <Compile Include="..\..\src\statements/UnscopedElse.cs" Link="/statements/UnscopedElse.cs" />
+    <Compile Include="..\..\src\statements/UnscopedFor.cs" Link="/statements/UnscopedFor.cs" />
+    <Compile Include="..\..\src\statements/UnscopedIf.cs" Link="/statements/UnscopedIf.cs" />
+    <Compile Include="..\..\src\statements/UnscopedWhile.cs" Link="/statements/UnscopedWhile.cs" />
+    <Compile Include="..\..\src\types/Char.cs" Link="/types/Char.cs" />
+    <Compile Include="..\..\src\types/Double.cs" Link="/types/Double.cs" />
+    <Compile Include="..\..\src\types/Enum.cs" Link="/types/Enum.cs" />
+    <Compile Include="..\..\src\types/Field.cs" Link="/types/Field.cs" />
+    <Compile Include="..\..\src\types/Float.cs" Link="/types/Float.cs" />
+    <Compile Include="..\..\src\types/FunctionPointerType.cs" Link="/types/FunctionPointerType.cs" />
+    <Compile Include="..\..\src\types/Int.cs" Link="/types/Int.cs" />
+    <Compile Include="..\..\src\types/Long.cs" Link="/types/Long.cs" />
+    <Compile Include="..\..\src\types/LongLong.cs" Link="/types/LongLong.cs" />
+    <Compile Include="..\..\src\types/Pointer.cs" Link="/types/Pointer.cs" />
+    <Compile Include="..\..\src\types/Short.cs" Link="/types/Short.cs" />
+    <Compile Include="..\..\src\types/SignedChar.cs" Link="/types/SignedChar.cs" />
+    <Compile Include="..\..\src\types/SizeT.cs" Link="/types/SizeT.cs" />
+    <Compile Include="..\..\src\types/StaticArray.cs" Link="/types/StaticArray.cs" />
+    <Compile Include="..\..\src\types/StdInt.cs" Link="/types/StdInt.cs" />
+    <Compile Include="..\..\src\types/Struct.cs" Link="/types/Struct.cs" />
+    <Compile Include="..\..\src\types/Type.cs" Link="/types/Type.cs" />
+    <Compile Include="..\..\src\types/Unsigned.cs" Link="/types/Unsigned.cs" />
+    <Compile Include="..\..\src\types/UnsignedChar.cs" Link="/types/UnsignedChar.cs" />
+    <Compile Include="..\..\src\types/UnsignedLong.cs" Link="/types/UnsignedLong.cs" />
+    <Compile Include="..\..\src\types/UnsignedLongLong.cs" Link="/types/UnsignedLongLong.cs" />
+    <Compile Include="..\..\src\types/UnsignedShort.cs" Link="/types/UnsignedShort.cs" />
+    <Compile Include="..\..\src\types/VariadicListType.cs" Link="/types/VariadicListType.cs" />
+    <Compile Include="..\..\src\types/Void.cs" Link="/types/Void.cs" />
+    <Compile Include="..\..\src\types/WChar.cs" Link="/types/WChar.cs" />
+    <Compile Include="..\..\src\variables/FunctionParameter.cs" Link="/variables/FunctionParameter.cs" />
+    <Compile Include="..\..\src\variables/GlobalVariable.cs" Link="/variables/GlobalVariable.cs" />
+    <Compile Include="..\..\src\variables/LocalVariable.cs" Link="/variables/LocalVariable.cs" />
+    <Compile Include="..\..\src\variables/Variable.cs" Link="/variables/Variable.cs" />
+    <Compile Include="..\..\src\variables/VariableDeclaration.cs" Link="/variables/VariableDeclaration.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Runic.Statement" Version="1.0.1" />
+    <PackageReference Include="Runic.Token" Version="1.0.1" />
+  </ItemGroup>
+</Project>

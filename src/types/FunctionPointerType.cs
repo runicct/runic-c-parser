@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+using System.Collections.Generic;
 using System.Text;
 
 namespace Runic.C
@@ -36,33 +37,55 @@ namespace Runic.C
                 // we return a special class and process it separatly
                 internal class FunctionReturningFunctionPointer : FunctionPointerType
                 {
+#if NET6_0_OR_GREATER
                     public FunctionReturningFunctionPointer(FunctionPointerType ReturnType, Token? Name, FunctionParameter[] Parameters) : base(ReturnType, Name, Parameters)
+#else
+                    public FunctionReturningFunctionPointer(FunctionPointerType ReturnType, Token Name, FunctionParameter[] Parameters) : base(ReturnType, Name, Parameters)
+#endif
                     {
                         _parameters = Parameters;
                     }
                 }
                 Type _returnType;
                 public Type ReturnType { get { return _returnType; } }
+#if NET6_0_OR_GREATER
                 Token? _name;
                 public Token? Name { get { return _name; } }
+#else
+                Token _name;
+                public Token Name { get { return _name; } }
+#endif
                 FunctionParameter[] _parameters;
                 public FunctionParameter[] Parameters { get { return _parameters; } }
-                internal FunctionPointerType(Type ReturnType, Token? Name, FunctionParameter[] Parameters)
+#if NET6_0_OR_GREATER
+                internal FunctionPointerType(Type returnType, Token? name, FunctionParameter[] parameters)
+#else
+                internal FunctionPointerType(Type returnType, Token name, FunctionParameter[] parameters)
+#endif
                 {
-                    _returnType = ReturnType;
-                    _name = Name;
-                    _parameters = Parameters;
+                    _returnType = returnType;
+                    _name = name;
+                    _parameters = parameters;
                 }
 
+#if NET6_0_OR_GREATER
                 internal static FunctionPointerType? Parse(IScope ParentScope, Parser Context, Type ReturnType, TokenQueue TokenQueue)
+#else
+                internal static FunctionPointerType Parse(IScope ParentScope, Parser Context, Type ReturnType, TokenQueue TokenQueue)
+#endif
                 {
                     FunctionParameter[] functionParameters;
                     bool declFunction = false;
                     FunctionParameter[] declFunctionParameters = null;
 
                     // Ok we have a function pointer that one will be a bit harder to parse
+#if NET6_0_OR_GREATER
                     Token? nameOrParenthesis = TokenQueue.ReadNextToken();
                     Token? name = null;
+#else
+                    Token nameOrParenthesis = TokenQueue.ReadNextToken();
+                    Token name = null;
+#endif
 
                     if (nameOrParenthesis == null) 
                     {
@@ -85,21 +108,32 @@ namespace Runic.C
                             List<FunctionParameter> declParametersList = new List<FunctionParameter>();
                             while (true)
                             {
+#if NET6_0_OR_GREATER
                                 Token? typeName = TokenQueue.ReadNextToken();
+#else
+                                Token typeName = TokenQueue.ReadNextToken();
+#endif
                                 if (typeName == null)
                                 {
                                     Context.Error_IncompleteDeclaration(name);
                                     return null;
                                 }
 
+#if NET6_0_OR_GREATER
                                 Type? parameterType = Type.Parse(ParentScope, Context, typeName, TokenQueue);
+#else
+                                Type parameterType = Type.Parse(ParentScope, Context, typeName, TokenQueue);
+#endif
                                 if (parameterType == null)
                                 {
                                     Context.Error_InvalidFunctionParameterType(name, typeName);
                                     parameterType = new Type.Int(typeName);
                                 }
-
+#if NET6_0_OR_GREATER
                                 Token? nameOrSeparator = TokenQueue.ReadNextToken();
+#else
+                                Token nameOrSeparator = TokenQueue.ReadNextToken();
+#endif
                                 if (nameOrSeparator == null)
                                 {
                                     Context.Error_IncompleteDeclaration(name);
@@ -138,7 +172,7 @@ namespace Runic.C
                                 if (nameOrSeparator.Value == ")") { break; }
                                 if (nameOrSeparator.Value == ",") { continue; }
                                 Context.Error_InvalidFunctionDefintion(name, nameOrSeparator);
-                                Token? separator = nameOrSeparator;
+                                Token separator = nameOrSeparator;
                                 while (separator.Value != ",")
                                 {
                                     nameOrSeparator = TokenQueue.ReadNextToken();
@@ -160,8 +194,11 @@ namespace Runic.C
                             resumeParsing:;
                             declFunctionParameters = declParametersList.ToArray();
 
+#if NET6_0_OR_GREATER
                             Token? closingParenthesis = TokenQueue.ReadNextToken();
-
+#else
+                            Token closingParenthesis = TokenQueue.ReadNextToken();
+#endif
                             if (closingParenthesis == null)
                             {
                                 Context.Error_IncompleteDeclaration(name);
@@ -180,7 +217,11 @@ namespace Runic.C
                         }
                     }
 
+#if NET6_0_OR_GREATER
                     Token? token = TokenQueue.ReadNextToken();
+#else
+                    Token token = TokenQueue.ReadNextToken();
+#endif
                     if (token == null || token.Value != "(")
                     {
                         if (token == null)
@@ -213,7 +254,11 @@ namespace Runic.C
                     while (true)
                     {
                         token = TokenQueue.ReadNextToken();
+#if NET6_0_OR_GREATER
                         Type? parameterType = Type.Parse(ParentScope, Context, token, TokenQueue);
+#else
+                        Type parameterType = Type.Parse(ParentScope, Context, token, TokenQueue);
+#endif
                         if (parameterType == null)
                         {
                             Context.Error_InvalidType(token);
@@ -247,8 +292,12 @@ namespace Runic.C
                         }
                         if (token.Value == "[")
                         {
+#if NET6_0_OR_GREATER
                             Expression? arraySize = Expression.Parse(ParentScope, Context, TokenQueue);
-                            if (arraySize == null) { /* TODO: ERROR */ }
+#else
+                            Expression arraySize = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
+                            if (arraySize == null) { return null; }
                             token = TokenQueue.ReadNextToken();
                             if (token.Value != "]")
                             {

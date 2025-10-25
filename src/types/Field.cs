@@ -30,6 +30,7 @@ namespace Runic.C
     {
         public class Field
         {
+#if NET6_0_OR_GREATER
             Type? _type;
             public Type? Type { get { return _type; } }
             Token? _name;
@@ -37,7 +38,15 @@ namespace Runic.C
             uint _index;
             public uint Index { get { return _index; } }
             internal Field(Type? Type, Token? Name, uint Index) { _type = Type; _name = Name; _index = Index; }
-
+#else
+            Type _type;
+            public Type Type { get { return _type; } }
+            Token _name;
+            public Token Name { get { return _name; } }
+            uint _index;
+            public uint Index { get { return _index; } }
+            internal Field(Type Type, Token Name, uint Index) { _type = Type; _name = Name; _index = Index; }
+#endif
             public override string ToString()
             {
                 if (_name == null)

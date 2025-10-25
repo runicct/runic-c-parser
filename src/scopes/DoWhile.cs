@@ -28,29 +28,49 @@ namespace Runic.C
     {
         public class DoWhile : Scope.Enter, IScope
         {
-            Token _token;
-            public Token Token { get { return _token; } }
+            Token _doToken;
+            public Token DoKeyword { get { return _doToken; } }
+            Token _whileToken;
+            public Token WhileKeyword { get { return _whileToken; } }
             Scope _body;
             internal Scope Body { get { return _body; } }
 
             Expression _condition;
             public Expression Condition { get { return _condition; } }
+#if NET6_0_OR_GREATER
             public IScope? ParentScope { get { return _body.ParentScope; } }
             public Type? ResolveType(string Name) { return _body.ResolveType(Name); }
             public Variable? ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
             public Function? ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
             public Type.Enum.Member? ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
             public IScope? GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
-            internal DoWhile(IScope ParentScope, Parser Context, Token DoToken)
+#else
+            public IScope ParentScope { get { return _body.ParentScope; } }
+            public Type ResolveType(string Name) { return _body.ResolveType(Name); }
+            public Variable ResolveVariable(string Name) { return _body.ResolveVariable(Name); }
+            public Function ResolveFunction(string Name) { return _body.ResolveFunction(Name); }
+            public Type.Enum.Member ResolveEnumMember(string Name) { return _body.ResolveEnumMember(Name); }
+            public IScope GetBreakContinueScope() { return _body.GetBreakContinueScope(); }
+#endif
+            internal DoWhile(IScope parentScope, Parser context, Token doToken)
             {
-                _body = new Scope.DoWhileScope(ParentScope, Context, this);
+                _doToken = doToken;
+                _body = new Scope.DoWhileScope(parentScope, context, this);
                 _scope = _body;
-                _condition = Condition;
             }
+#if NET6_0_OR_GREATER
             internal static Scope.ExitDoWhile? ParseExitDoWhile(IScope ParentScope, Token? PreviousToken, Parser Context, DoWhile DoWhile, TokenQueue TokenQueue)
+#else
+            internal static Scope.ExitDoWhile ParseExitDoWhile(IScope ParentScope, Token PreviousToken, Parser Context, DoWhile DoWhile, TokenQueue TokenQueue)
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? token = TokenQueue.ReadNextToken();
                 Token? previousToken = PreviousToken;
+#else
+                Token token = TokenQueue.ReadNextToken();
+                Token previousToken = PreviousToken;
+#endif
 
                 if (token == null)
                 {
@@ -63,35 +83,41 @@ namespace Runic.C
                     return null;
                 }
                 Token whileToken = token;
+                DoWhile._whileToken = whileToken;
                 previousToken = token;
                 token = TokenQueue.ReadNextToken();
                 if (token == null)
                 {
-                    Context.Error_ExpectedCondition(DoWhile._token, token);
+                    Context.Error_ExpectedCondition(DoWhile._doToken, token);
                     return null;
                 }
                 if (token.Value != "(")
                 {
-                    Context.Error_ExpectedCondition(DoWhile._token, token);
+                    Context.Error_ExpectedCondition(DoWhile._doToken, token);
                     while (!Context.ReattachToken(token)) { token = TokenQueue.ReadNextToken(); }
                     return null;
                 }
                 previousToken = token;
+#if NET6_0_OR_GREATER
                 Expression? condition = Expression.Parse(ParentScope, Context, TokenQueue);
+#else
+                Expression condition = Expression.Parse(ParentScope, Context, TokenQueue);
+#endif
                 if (condition == null)
                 {
-                    Context.Error_ExpectedCondition(DoWhile._token, previousToken);
+                    Context.Error_ExpectedCondition(DoWhile._doToken, previousToken);
                     return null;
                 }
+                DoWhile._condition = condition;
                 token = TokenQueue.ReadNextToken();
                 if (token == null)
                 {
-                    Context.Error_ExpectedCondition(DoWhile._token, previousToken);
+                    Context.Error_ExpectedCondition(DoWhile._doToken, previousToken);
                     return null;
                 }
                 if (token.Value != ")")
                 {
-                    Context.Error_ExpectedCondition(DoWhile._token, token);
+                    Context.Error_ExpectedCondition(DoWhile._doToken, token);
                     while (token != null && (token.Value != ")" || token.Value != "}" || token.Value != ";")) { token = TokenQueue.ReadNextToken(); }
                     return null;
                 }

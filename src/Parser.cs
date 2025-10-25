@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+using System;
+using System.Collections.Generic;
+
 namespace Runic.C
 {
     public partial class Parser : IStatementStream
@@ -51,9 +54,17 @@ namespace Runic.C
                 _tokenStream = tokenStream;
             }
 
+#if NET6_0_OR_GREATER
             public Token? ReadNextToken()
+#else
+            public Token ReadNextToken()
+#endif
             {
+#if NET6_0_OR_GREATER
                 Token? token = _tokenStream.ReadNextToken();
+#else
+                Token token = _tokenStream.ReadNextToken();
+#endif
                 while (token != null)
                 {
                     switch (token.Value)
@@ -118,20 +129,20 @@ namespace Runic.C
         public virtual void Error_UnbalencedBracket(Token Token) { }
         public virtual void Error_UnbalencedParenthesis(Token Token) { }
         public virtual void Error_UnexpectedToken(Token Token) { }
-        public virtual void Error_FieldDoesNotExistInStruct(Token Field, Type.StructOrUnion? Struct) { }
-        public virtual void Error_InvalidFunctionAttribute(Token AttributeToken, Token? AttributeValue) { }
+        public virtual void Error_FieldDoesNotExistInStruct(Token Field, Type.StructOrUnion Struct) { }
+        public virtual void Error_InvalidFunctionAttribute(Token AttributeToken, Token AttributeValue) { }
         public virtual void Error_InvalidFunctionParameterType(Token FunctionName, Token Type) { }
         public virtual void Error_InvalidAssignmentTarget(Token Assignment, Expression Target) { }
         public virtual void Error_InvalidFunctionCall(Function Function, Token InvalidToken) { }
-        public virtual void Error_VariadicSpecifierMustEndParameterList(Token Function, Token? InvalidToken) { }
-        public virtual void Error_InvalidOperatorTarget(Token? Operator, Expression Target) { }
+        public virtual void Error_VariadicSpecifierMustEndParameterList(Token Function, Token InvalidToken) { }
+        public virtual void Error_InvalidOperatorTarget(Token Operator, Expression Target) { }
         public virtual void Error_UndefinedVariable(Token Variable) { }
         public virtual void Error_UndefinedFunction(Token Variable) { }
-        public virtual void Error_ExpectedCondition(Token Statement, Token? InvalidToken) { }
-        public virtual void Error_LabelUsedOutsideFunction(Token? InvalidLabel) { }
+        public virtual void Error_ExpectedCondition(Token Statement, Token InvalidToken) { }
+        public virtual void Error_LabelUsedOutsideFunction(Token InvalidLabel) { }
         public virtual void Error_ExpectedWhile(Token Token) { }
-        public virtual void Error_InvalidCast(Type? Type, Token Token) { }
-        public virtual void Error_InvalidMemberAccess(Variable? Variable, Token? Operator, Token? FieldName) { }
+        public virtual void Error_InvalidCast(Type Type, Token Token) { }
+        public virtual void Error_InvalidMemberAccess(Variable Variable, Token Operator, Token FieldName) { }
         public virtual void Error_InvalidStatementOutsideOfASwitchOrLoop(Token Token) { }
         public virtual void Error_InvalidReferenceTarget(Token Reference, Expression Target) { }
         public virtual void Error_FieldInitializedMultipleTimeInCompoundLiterals(Token FieldName) { }
@@ -154,7 +165,11 @@ namespace Runic.C
 
         // This function can be used to re-attach the parser after an error to
         // something that looks valid. This is best effort
+#if NET6_0_OR_GREATER
         internal bool ReattachToken(Token? token)
+#else
+        internal bool ReattachToken(Token token)
+#endif
         {
             if (token == null) { return true; }
             switch (token.Value)
@@ -207,18 +222,29 @@ namespace Runic.C
         }
 
         State _state = State.Normal;
+#if NET6_0_OR_GREATER
         Type? _pendingType;
+#else
+        Type _pendingType;
+#endif
         Expression[] ParseStaticArrayDim(Token staticArrayToken)
         {
+#if NET6_0_OR_GREATER
+            Token? token;
+#else
             Token token;
+#endif
             List<Expression> length = new List<Expression>();
             while (true)
             {
+#if NET6_0_OR_GREATER
                 Expression? expression = Expression.Parse(_scopes.Peek(), this, _input);
+#else
+                Expression expression = Expression.Parse(_scopes.Peek(), this, _input);
+#endif
 
                 if (expression == null)
                 {
-                    // __TODO__ ERROR
                     return new Expression[] { new Expression.Constant(new Token[] { }) };
                 }
 
@@ -249,10 +275,18 @@ namespace Runic.C
             }
             return length.ToArray();
         }
-        Statement? ParseDeclaration(Attribute[] attributes, Type? type, Token? token)
+#if NET6_0_OR_GREATER
+        Statement? ParseDeclaration(Attribute[] attributes, Type type, Token token)
+#else
+        Statement ParseDeclaration(Attribute[] attributes, Type type, Token token)
+#endif
         {
             Scope parentScope = _scopes.Peek();
+#if NET6_0_OR_GREATER
             Function? parentFunction = parentScope.GetParentFunction();
+#else
+            Function parentFunction = parentScope.GetParentFunction();
+#endif
             if (type != null)
             {
                 switch (type)
@@ -266,7 +300,11 @@ namespace Runic.C
                     case Type.Enum @enum:
                         if (@enum.Name == null)
                         {
+#if NET6_0_OR_GREATER
                             Type.Enum.EnumDeclation? enumDeclaration = @enum as Type.Enum.EnumDeclation;
+#else
+                            Type.Enum.EnumDeclation enumDeclaration = @enum as Type.Enum.EnumDeclation;
+#endif
                             if (enumDeclaration != null)
                             {
                                 _scopes.Peek().AddEnumValues(enumDeclaration);
@@ -277,7 +315,11 @@ namespace Runic.C
                     case Type.FunctionPointerType.FunctionReturningFunctionPointer functionReturningFunctionPointer:
                         if (functionReturningFunctionPointer.Name != null)
                         {
+#if NET6_0_OR_GREATER
                             Token? declarationOrDefinition = _input.ReadNextToken();
+#else
+                            Token declarationOrDefinition = _input.ReadNextToken();
+#endif
                             if (declarationOrDefinition == null)
                             {
                                 Error_IncompleteDeclaration(token);
@@ -296,7 +338,11 @@ namespace Runic.C
                 }
 
                 Token name;
+#if NET6_0_OR_GREATER
                 Token? variableNameOrSemicolumn = _input.ReadNextToken();
+#else
+                Token variableNameOrSemicolumn = _input.ReadNextToken();
+#endif
                 if (variableNameOrSemicolumn == null)
                 {
                     Error_IncompleteDeclaration(token);
@@ -334,7 +380,11 @@ namespace Runic.C
                     Error_IncompleteDeclaration(name);
                     return null;
                 }
+#if NET6_0_OR_GREATER
                 Token? staticArrayToken = null;
+#else
+                Token staticArrayToken = null;
+#endif
                 bool implicitStaticArraySize = false;
                 if (token.Value == "[")
                 {
@@ -347,7 +397,11 @@ namespace Runic.C
                     }
                     else
                     {
+#if NET6_0_OR_GREATER
                         Expression? arraySize = Expression.Parse(_scopes.Peek(), this, _input);
+#else
+                        Expression arraySize = Expression.Parse(_scopes.Peek(), this, _input);
+#endif
                         token = _input.ReadNextToken();
                         if (token == null)
                         {
@@ -372,9 +426,15 @@ namespace Runic.C
                     case "=":
                         {
                             Token equal = token;
+#if NET6_0_OR_GREATER
                             Type.StructOrUnion? variableStructType = type as Type.StructOrUnion;
                             Expression? initialization = Expression.Parse(_scopes.Peek(), this, _input);
                             Expression.CompoundLiteralsList? compountLiteralsListInit = initialization as Expression.CompoundLiteralsList;
+#else
+                            Type.StructOrUnion variableStructType = type as Type.StructOrUnion;
+                            Expression initialization = Expression.Parse(_scopes.Peek(), this, _input);
+                            Expression.CompoundLiteralsList compountLiteralsListInit = initialization as Expression.CompoundLiteralsList;
+#endif
                             if (compountLiteralsListInit != null)
                             {
                                 if (implicitStaticArraySize)
@@ -517,7 +577,11 @@ namespace Runic.C
                                             break;
                                         }
                                     }
+#if NET6_0_OR_GREATER
                                     Type? parameterType = Type.Parse(_scopes.Peek(), this, token, _input);
+#else
+                                    Type parameterType = Type.Parse(_scopes.Peek(), this, token, _input);
+#endif
                                     if (parameterType == null)
                                     {
                                         parameterType = new Type.Int(token);
@@ -540,13 +604,17 @@ namespace Runic.C
                                     // If we hit a '[' We might have an anonymous parameter type array like char[X]
                                     if (token.Value == "[")
                                     {
+#if NET6_0_OR_GREATER
                                         Expression[]? length = ParseStaticArrayDim(token);
+#else
+                                        Expression[] length = ParseStaticArrayDim(token);
+#endif
                                         if (length == null)
                                         {
                                             Error_IncompleteDeclaration(name);
                                             return null;
                                         }
-                                        parameterType.MakeStaticArray(token, length.ToArray());
+                                        parameterType.MakeStaticArray(token, length);
                                         exceptAnonymousParameter = true;
                                         token = _input.ReadNextToken();
                                         if (token == null)
@@ -589,13 +657,17 @@ namespace Runic.C
 
                                     if (token.Value == "[")
                                     {
+#if NET6_0_OR_GREATER
                                         Expression[]? length = ParseStaticArrayDim(token);
+#else
+                                        Expression[] length = ParseStaticArrayDim(token);
+#endif
                                         if (length == null)
                                         {
                                             Error_IncompleteDeclaration(name);
                                             return null;
                                         }
-                                        parameterType.MakeStaticArray(token, length.ToArray());
+                                        parameterType.MakeStaticArray(token, length);
                                         token = _input.ReadNextToken();
                                         if (token == null)
                                         {
@@ -673,15 +745,27 @@ namespace Runic.C
             return null;
         }
         Queue<Statement> _pendingStatements = new Queue<Statement>();
+#if NET6_0_OR_GREATER
         public Statement? ReadNextStatementVariableDeclaration()
+#else
+        public Statement ReadNextStatementVariableDeclaration()
+#endif
         {
             _pendingType = _pendingType.Strip();
             Scope parentScope = _scopes.Peek();
+#if NET6_0_OR_GREATER
             Function? parentFunction = parentScope.GetParentFunction();
+#else
+            Function parentFunction = parentScope.GetParentFunction();
+#endif
 
             _state = State.Normal;
             restart:;
+#if NET6_0_OR_GREATER
             Token? token = _input.ReadNextToken();
+#else
+            Token token = _input.ReadNextToken();
+#endif
             if (token == null)
             {
                 return null;
@@ -705,7 +789,7 @@ namespace Runic.C
                 }
             }
 
-            Token? name = token;
+            Token name = token;
 
             if (!Identifier.IsValid(name, _standardRevision))
             {
@@ -742,12 +826,18 @@ namespace Runic.C
             if (token.Value == "=")
             {
                 Token equal = token;
+#if NET6_0_OR_GREATER
                 Type.StructOrUnion? variableStructType = variable.Type as Type.StructOrUnion;
                 Expression? initialization = Expression.Parse(_scopes.Peek(), this, _input);
-                Expression.CompoundLiteralsList? compountLiteralsListInit = initialization as Expression.CompoundLiteralsList;
-                if (compountLiteralsListInit != null)
+                Expression.CompoundLiteralsList? compoundLiteralsListInit = initialization as Expression.CompoundLiteralsList;
+#else
+                Type.StructOrUnion variableStructType = variable.Type as Type.StructOrUnion;
+                Expression initialization = Expression.Parse(_scopes.Peek(), this, _input);
+                Expression.CompoundLiteralsList compoundLiteralsListInit = initialization as Expression.CompoundLiteralsList;
+#endif
+                if (compoundLiteralsListInit != null)
                 {
-                    if (variableStructType != null) { initialization = Expression.CompoundLiteralsStruct.Create(this, compountLiteralsListInit, variableStructType); }
+                    if (variableStructType != null) { initialization = Expression.CompoundLiteralsStruct.Create(this, compoundLiteralsListInit, variableStructType); }
                 }
                 token = _input.ReadNextToken();
                 if (token == null)
@@ -769,11 +859,18 @@ namespace Runic.C
 
             return null;
         }
-
+#if NET6_0_OR_GREATER
         public Statement? ReadNextStatementNormal()
+#else
+        public Statement ReadNextStatementNormal()
+#endif
         {
             restart:;
+#if NET6_0_OR_GREATER
             Token? token = _input.ReadNextToken();
+#else
+            Token token = _input.ReadNextToken();
+#endif
             if (token == null) { return null; }
             switch (token.Value)
             {
@@ -806,9 +903,11 @@ namespace Runic.C
                             case Scope.SwitchScope switchScope: return new Scope.ExitSwitch(token, switchScope, switchScope.Switch);
                             case Scope.DoWhileScope doWhileScope:
                                 {
-
-
+#if NET6_0_OR_GREATER
                                     Scope.ExitDoWhile? exitDoWhile = DoWhile.ParseExitDoWhile(_scopes.Peek(), token, this, doWhileScope.DoWhile, _input);
+#else
+                                    Scope.ExitDoWhile exitDoWhile = DoWhile.ParseExitDoWhile(_scopes.Peek(), token, this, doWhileScope.DoWhile, _input);
+#endif
                                     if (exitDoWhile == null)
                                     {
                                         exitDoWhile = new Scope.ExitDoWhile(token, doWhileScope, doWhileScope.DoWhile, new Expression.Constant(new Token[] { }));
@@ -821,7 +920,11 @@ namespace Runic.C
                 case "(":
                     {
                         _input.FrontLoadToken(token);
+#if NET6_0_OR_GREATER
                         Expression? expression = Expression.Parse(_scopes.Peek(), this, _input);
+#else
+                        Expression expression = Expression.Parse(_scopes.Peek(), this, _input);
+#endif
                         token = _input.ReadNextToken();
                         if (token == null)
                         {
@@ -836,12 +939,20 @@ namespace Runic.C
                     }
                 case "if":
                     {
+#if NET6_0_OR_GREATER
                         If? ifStatement = If.ParseIf(_scopes.Peek(), this, token, _input);
+#else
+                        If ifStatement = If.ParseIf(_scopes.Peek(), this, token, _input);
+#endif
                         if (ifStatement == null)
                         {
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return ifStatement;
@@ -856,8 +967,13 @@ namespace Runic.C
                     }
                 case "else":
                     {
+#if NET6_0_OR_GREATER
                         Else? elseStatement = new Else(_scopes.Peek(), this, token);
                         Token? next = _input.PeekToken();
+#else
+                        Else elseStatement = new Else(_scopes.Peek(), this, token);
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return elseStatement;
@@ -872,12 +988,20 @@ namespace Runic.C
                     }
                 case "for":
                     {
+#if NET6_0_OR_GREATER
                         For? forStatement = For.ParseFor(_scopes.Peek(), this, token, _input);
+#else
+                        For forStatement = For.ParseFor(_scopes.Peek(), this, token, _input);
+#endif
                         if (forStatement == null)
                         {
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return forStatement;
@@ -896,7 +1020,11 @@ namespace Runic.C
                 case "do":
                     {
                         DoWhile doWhile = new DoWhile(_scopes.Peek(), this, token);
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return doWhile;
@@ -912,12 +1040,20 @@ namespace Runic.C
                     break;
                 case "while":
                     {
+#if NET6_0_OR_GREATER
                         While? whileStatement = While.ParseWhile(_scopes.Peek(), this, token, _input);
+#else
+                        While whileStatement = While.ParseWhile(_scopes.Peek(), this, token, _input);
+#endif
                         if (whileStatement == null)
                         {
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return whileStatement;
@@ -941,7 +1077,11 @@ namespace Runic.C
                     }
                 case "return":
                     {
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             Error_IncompleteStatement(token);
@@ -952,7 +1092,11 @@ namespace Runic.C
                             _input.ReadNextToken();
                             return new Return(_scopes.Peek(), this, token, null);
                         }
+#if NET6_0_OR_GREATER
                         Expression? expression = Expression.Parse(_scopes.Peek(), this, _input, true);
+#else
+                        Expression expression = Expression.Parse(_scopes.Peek(), this, _input, true);
+#endif
                         next = _input.PeekToken();
                         if (next == null)
                         {
@@ -966,7 +1110,11 @@ namespace Runic.C
                     }
                     break;
                 case "typedef":
+#if NET6_0_OR_GREATER
                     Typedef[]? typedef = Typedef.Parse(_scopes.Peek(), this, token, _input);
+#else
+                    Typedef[] typedef = Typedef.Parse(_scopes.Peek(), this, token, _input);
+#endif
                     if (typedef == null || typedef.Length == 0) { goto restart; }
                     for (int n = 0; n < typedef.Length; n++)
                     {
@@ -976,12 +1124,20 @@ namespace Runic.C
                     return null;
                 case "switch":
                     {
+#if NET6_0_OR_GREATER
                         Switch? switchStatement = Switch.ParseSwitch(_scopes.Peek(), this, token, _input);
+#else
+                        Switch switchStatement = Switch.ParseSwitch(_scopes.Peek(), this, token, _input);
+#endif
                         if (switchStatement == null)
                         {
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             return switchStatement;
@@ -997,13 +1153,21 @@ namespace Runic.C
                     }
                 case "case":
                     {
+#if NET6_0_OR_GREATER
                         Token? next = _input.PeekToken();
+#else
+                        Token next = _input.PeekToken();
+#endif
                         if (next == null)
                         {
                             Error_IncompleteStatement(token);
                             return null;
                         }
+#if NET6_0_OR_GREATER
                         Expression? constantExpression = Expression.Parse(_scopes.Peek(), this, _input, true);
+#else
+                        Expression constantExpression = Expression.Parse(_scopes.Peek(), this, _input, true);
+#endif
                         next = _input.ReadNextToken();
                         if (next == null)
                         {
@@ -1014,7 +1178,11 @@ namespace Runic.C
                         {
                             // TODO Error
                         }
+#if NET6_0_OR_GREATER
                         Scope.SwitchScope? switchScope = _scopes.Peek() as Scope.SwitchScope;
+#else
+                        Scope.SwitchScope switchScope = _scopes.Peek() as Scope.SwitchScope;
+#endif
                         if (switchScope == null)
                         {
                             Error_CaseOutsideOfSwitch(token);
@@ -1025,7 +1193,11 @@ namespace Runic.C
                     }
                 case "break":
                     {
+#if NET6_0_OR_GREATER
                         Token? next = _input.ReadNextToken();
+#else
+                        Token next = _input.ReadNextToken();
+#endif
                         if (next == null)
                         {
                             Error_IncompleteStatement(token);
@@ -1035,7 +1207,11 @@ namespace Runic.C
                         {
                             ReattachToken(next);
                         }
+#if NET6_0_OR_GREATER
                         IScope? scope = _scopes.Peek().GetBreakContinueScope();
+#else
+                        IScope scope = _scopes.Peek().GetBreakContinueScope();
+#endif
                         if (scope == null)
                         {
                             Error_InvalidStatementOutsideOfASwitchOrLoop(token);
@@ -1054,7 +1230,11 @@ namespace Runic.C
                     }
                 case "default":
                     {
+#if NET6_0_OR_GREATER
                         Token? next = _input.ReadNextToken();
+#else
+                        Token next = _input.ReadNextToken();
+#endif
                         if (next == null)
                         {
                             Error_IncompleteStatement(token);
@@ -1064,7 +1244,11 @@ namespace Runic.C
                         {
                             // TODO Error
                         }
+#if NET6_0_OR_GREATER
                         Scope.SwitchScope? switchScope = _scopes.Peek() as Scope.SwitchScope;
+#else
+                        Scope.SwitchScope switchScope = _scopes.Peek() as Scope.SwitchScope;
+#endif
                         if (switchScope == null)
                         {
                             Error_CaseOutsideOfSwitch(token);
@@ -1088,11 +1272,19 @@ namespace Runic.C
                     }
                     if (Identifier.IsValid(token, _standardRevision) && (_scopes.Peek().ResolveType(token.Value) == null))
                     {
+#if NET6_0_OR_GREATER
                         Token? maybeLabel = _input.PeekToken();
+#else
+                        Token maybeLabel = _input.PeekToken();
+#endif
                         if (maybeLabel != null && maybeLabel.Value == ":")
                         {
                             _input.ReadNextToken();
+#if NET6_0_OR_GREATER
                             Function? function = _scopes.Peek().GetParentFunction();
+#else
+                            Function function = _scopes.Peek().GetParentFunction();
+#endif
                             if (function == null)
                             {
                                 Error_LabelUsedOutsideFunction(maybeLabel);
@@ -1103,7 +1295,11 @@ namespace Runic.C
                             }
                         }
                         _input.FrontLoadToken(token);
+#if NET6_0_OR_GREATER
                         Expression? expression = Expression.Parse(_scopes.Peek(), this, _input, false);
+#else
+                        Expression expression = Expression.Parse(_scopes.Peek(), this, _input, false);
+#endif
                         token = _input.ReadNextToken();
                         if (token == null)
                         {
@@ -1116,8 +1312,11 @@ namespace Runic.C
                         }
                         return expression;
                     }
-
+#if NET6_0_OR_GREATER
                     Type? type = Type.Parse(_scopes.Peek(), this, token, _input);
+#else
+                    Type type = Type.Parse(_scopes.Peek(), this, token, _input);
+#endif
                     if (type != null)
                     {
                         return ParseDeclaration(attributes, type, token);
@@ -1135,7 +1334,11 @@ namespace Runic.C
 
             ReadNextStatement();
         }
+#if NET6_0_OR_GREATER
         public Statement? ReadNextStatement()
+#else
+        public Statement ReadNextStatement()
+#endif
         {
             if (_pendingStatements.Count > 0)
             {
@@ -1145,7 +1348,11 @@ namespace Runic.C
             {
                 case State.Normal:
                     restart:
+#if NET6_0_OR_GREATER
                     Statement? statement = ReadNextStatementNormal();
+#else
+                    Statement statement = ReadNextStatementNormal();
+#endif
                     if (statement == null && _pendingStatements.Count > 0)
                     {
                         return _pendingStatements.Dequeue();

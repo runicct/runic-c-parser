@@ -34,28 +34,29 @@ namespace Runic.C
             {
                 Expression _function;
                 public Expression Function { get { return _function; } }
-                Expression[] _paramters;
-                public Expression[] Parameters { get { return _paramters; } }
-                Token? _leftParenthesis;
-                Token? _rightParenthesis;
-
-                internal IndirectCall(Expression function, Token? leftParenthesis, Expression[] paramter, Token? rightParenthesis)
+                Expression[] _parameters;
+                public Expression[] Parameters { get { return _parameters; } }
+                Token _leftParenthesis;
+                public Token LeftParenthesis { get { return _leftParenthesis; } }
+                Token _rightParenthesis;
+                public Token RightParenthesis { get { return _rightParenthesis; } }
+                internal IndirectCall(Expression function, Token leftParenthesis, Expression[] parameters, Token rightParenthesis)
                 {
                     _function = function;
-                    _paramters = paramter;
+                    _parameters = parameters;
                     _leftParenthesis = leftParenthesis;
                     _rightParenthesis = rightParenthesis;
                 }
                 public override string ToString()
                 {
                     StringBuilder stringBuilder = new StringBuilder();
-                    for (int n = 0; n < _paramters.Length; n++)
+                    for (int n = 0; n < _parameters.Length; n++)
                     {
                         if (n != 0)
                         {
                             stringBuilder.Append(", ");
                         }
-                        stringBuilder.Append(_paramters[n].ToString());
+                        stringBuilder.Append(_parameters[n].ToString());
                     }
                     return "(" + _function.ToString() + ")(" + stringBuilder.ToString() + ")";
                 }
