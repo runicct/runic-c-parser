@@ -35,10 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Runic.Statement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Runic.Statement.1.0.1\lib\net48\Runic.Statement.dll</HintPath>
+      <HintPath>..\..\packages\Runic.Statement.1.0.1\lib\net48\Runic.Statement.dll</HintPath>
     </Reference>
     <Reference Include="Runic.Token, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Runic.Token.1.0.1\lib\net48\Runic.Token.dll</HintPath>
+      <HintPath>..\..\packages\Runic.Token.1.0.1\lib\net48\Runic.Token.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
