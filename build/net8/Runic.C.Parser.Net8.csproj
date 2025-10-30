@@ -33,9 +33,11 @@
     <Compile Include="..\..\src\expressions/LogicalAnd.cs" Link="/expressions/LogicalAnd.cs" />
     <Compile Include="..\..\src\expressions/LogicalOr.cs" Link="/expressions/LogicalOr.cs" />
     <Compile Include="..\..\src\expressions/Mul.cs" Link="/expressions/Mul.cs" />
+    <Compile Include="..\..\src\expressions/Rem.cs" Link="/expressions/Rem.cs" />  
     <Compile Include="..\..\src\expressions/Not.cs" Link="/expressions/Not.cs" />
     <Compile Include="..\..\src\expressions/Nullptr.cs" Link="/expressions/Nullptr.cs" />
     <Compile Include="..\..\src\expressions/Or.cs" Link="/expressions/Or.cs" />
+    <Compile Include="..\..\src\expressions/Xor.cs" Link="/expressions/Xor.cs" />
     <Compile Include="..\..\src\expressions/Reference.cs" Link="/expressions/Reference.cs" />
     <Compile Include="..\..\src\expressions/SizeOf.cs" Link="/expressions/SizeOf.cs" />
     <Compile Include="..\..\src\expressions/Sub.cs" Link="/expressions/Sub.cs" />

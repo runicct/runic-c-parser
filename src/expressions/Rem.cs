@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  * 
  * Copyright (c) 2025 Runic Compiler Toolkit Contributors
@@ -28,27 +28,23 @@ namespace Runic.C
     {
         public abstract partial class Expression
         {
-            public class Cast : Expression
+            public class Rem : Expression
             {
-                Type _type;
-                internal override Type Type { get { return _type; } }
-                public Type TargetType { get { return _type; } }
-                Expression _value;
-                public Expression Value { get { return _value; } }
-                Token _leftParenthesis;
-                public Token LeftParenthesis { get { return _leftParenthesis; } }
-                Token _rightParenthesis;
-                public Token RightParenthesis { get { return _rightParenthesis; } }
-                internal Cast(Token leftParenthesis, Type type, Token rightParenthesis, Expression value)
+                Expression _left;
+                public Expression Left { get { return _left; } }
+                Expression _right;
+                public Expression Right { get { return _right; } }
+                Token _operator;
+                public Token Operator { get { return _operator; } }
+                internal Rem(Token op, Expression left, Expression right)
                 {
-                    _value = value;
-                    _leftParenthesis = leftParenthesis;
-                    _rightParenthesis = rightParenthesis;
-                    _type = type;
+                    _left = left;
+                    _right = right;
+                    _operator = op;
                 }
                 public override string ToString()
                 {
-                    return "(" + _type + ")(" + _value + ")";
+                    return "(" + _left + ") % (" + _right + ")";
                 }
             }
         }

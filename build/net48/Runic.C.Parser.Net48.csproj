@@ -122,6 +122,9 @@
     <Compile Include="..\..\src\expressions/Mul.cs">
       <Link>/expressions/Mul.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\expressions/Rem.cs">
+      <Link>/expressions/Rem.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\expressions/Not.cs">
       <Link>/expressions/Not.cs</Link>
     </Compile>
@@ -130,6 +133,9 @@
     </Compile>
     <Compile Include="..\..\src\expressions/Or.cs">
       <Link>/expressions/Or.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\expressions/Xor.cs">
+      <Link>/expressions/Xor.cs</Link>
     </Compile>
     <Compile Include="..\..\src\expressions/Reference.cs">
       <Link>/expressions/Reference.cs</Link>

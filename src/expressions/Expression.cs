@@ -443,6 +443,18 @@ namespace Runic.C
                             Expression left = Expressions.Pop(token);
                             return ProcessAssignment(Context, token, left, new Div(token, left, right));
                         }
+                    case "%":
+                        {
+                            Expression right = Expressions.Pop(token);
+                            Expression left = Expressions.Pop(token);
+                            return new Rem(token, left, right);
+                        }
+                    case "%=":
+                        {
+                            Expression right = Expressions.Pop(token);
+                            Expression left = Expressions.Pop(token);
+                            return ProcessAssignment(Context, token, left, new Rem(token, left, right));
+                        }
                     case "==":
                         {
                             Expression right = Expressions.Pop(token);
@@ -490,6 +502,18 @@ namespace Runic.C
                             Expression right = Expressions.Pop(token);
                             Expression left = Expressions.Pop(token);
                             return ProcessAssignment(Context, token, left, new Or(token, left, right));
+                        }
+                    case "^":
+                        {
+                            Expression right = Expressions.Pop(token);
+                            Expression left = Expressions.Pop(token);
+                            return new Xor(token, left, right);
+                        }
+                    case "^=":
+                        {
+                            Expression right = Expressions.Pop(token);
+                            Expression left = Expressions.Pop(token);
+                            return ProcessAssignment(Context, token, left, new Xor(token, left, right));
                         }
                     case "=":
                         {
