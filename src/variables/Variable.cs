@@ -29,6 +29,7 @@ namespace Runic.C
         public abstract class Variable : Expression
         {
             Type _Type;
+            public Type VariableType { get { return _Type; } }
             internal override Type Type { get { return _Type; } }
 #if NET6_0_OR_GREATER
             Token? _Name;
