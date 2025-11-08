@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  * 
  * Copyright (c) 2025 Runic Compiler Toolkit Contributors
@@ -22,65 +22,63 @@
  * SOFTWARE.
  */
 
-using static Runic.C.Parser;
-
 namespace Runic.C
 {
     public partial class Parser
     {
-        public abstract class Break : Statement
+        public abstract class Continue : Statement
         {
-            Token _break;
-            public Token Keyword { get { return _break; } }
-            internal Break(Token @break)
+            Token _continue;
+            public Token Keyword { get { return _continue; } }
+            internal Continue(Token @continue)
             {
-                _break = @break;
+                _continue = @continue;
             }
             public override string ToString()
             {
-                return "break;";
+                return "continue;";
             }
-            public class SwitchBreak : Break
+            public class SwitchContinue : Continue
             {
                 Switch _parent;
                 public Switch Switch { get { return _parent; } }
-                internal SwitchBreak(Token @break, Switch parent) : base(@break)
+                internal SwitchContinue(Token @continue, Switch parent) : base(@continue)
                 {
                     _parent = parent;
                 }
             }
-            public class ForBreak : Break
+            public class ForContinue : Continue
             {
                 For _parent;
                 public For For { get { return _parent; } }
-                internal ForBreak(Token @break, For parent) : base(@break)
+                internal ForContinue(Token @continue, For parent) : base(@continue)
                 {
                     _parent = parent;
                 }
             }
-            public class UnscopedForBreak : Break
+            public class UnscopedForContinue : Continue
             {
                 UnscopedFor _parent;
                 public UnscopedFor For { get { return _parent; } }
-                internal UnscopedForBreak(Token @break, UnscopedFor parent) : base(@break)
+                internal UnscopedForContinue(Token @continue, UnscopedFor parent) : base(@continue)
                 {
                     _parent = parent;
                 }
             }
-            public class WhileBreak : Break
+            public class WhileContinue : Continue
             {
                 While _parent;
                 public While While { get { return _parent; } }
-                internal WhileBreak(Token @break, While parent) : base(@break)
+                internal WhileContinue(Token @continue, While parent) : base(@continue)
                 {
                     _parent = parent;
                 }
             }
-            public class DoWhileBreak : Break
+            public class DoWhileContinue : Continue
             {
                 DoWhile _parent;
                 public DoWhile DoWhile { get { return _parent; } }
-                internal DoWhileBreak(Token @break, DoWhile parent) : base(@break)
+                internal DoWhileContinue(Token @continue, DoWhile parent) : base(@continue)
                 {
                     _parent = parent;
                 }

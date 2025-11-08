@@ -606,11 +606,22 @@ namespace Runic.C
                 return OperatorPrecedence.GetPrecendence(op);
             }
 #if NET6_0_OR_GREATER
-            internal static Expression? ParseFunctionCall(Function Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
+            internal static Expression? ParseFunctionCall(Statement Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
 #else
-            internal static Expression ParseFunctionCall(Function Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
+            internal static Expression ParseFunctionCall(Statement Function, IScope ParentScope, Parser Context, TokenQueue TokenQueue)
 #endif
             {
+                FunctionParameter[] functionParameters = null;
+                switch (Function)
+                {
+                    case Function func: functionParameters = func.FunctionParameters; break;
+                    case Expression func:
+                        Type.FunctionPointerType functionPointerType = func.Type as Type.FunctionPointerType;
+                        if (functionPointerType != null) { functionParameters = functionPointerType.Parameters; }
+                        else { functionParameters = new FunctionParameter[0]; }
+                        break;
+                }
+
 #if NET6_0_OR_GREATER
                 Token? leftParenthesis;
                 Token? rightParenthesis = null;
@@ -623,7 +634,11 @@ namespace Runic.C
                 if (token == null) { return null; }
                 if (token.Value != "(")
                 {
-                    Context.Error_InvalidFunctionCall(Function, token);
+                    switch (Function)
+                    {
+                        case Function func: Context.Error_InvalidFunctionCall(func, token); break;
+                        case Expression func: Context.Error_InvalidFunctionCall(func, token); break;
+                    }
                     return null;
                 }
                 leftParenthesis = token;
@@ -638,7 +653,11 @@ namespace Runic.C
                 if (token == null || token.Value == ")")
                 {
                     TokenQueue.ReadNextToken();
-                    return new Call(Function, leftParenthesis, new FunctionParameter[] { }, token);
+                    switch (Function)
+                    {
+                        case Function func: return new Call(func, leftParenthesis, new FunctionParameter[] { }, token);
+                        case Expression func: return new IndirectCall(func, leftParenthesis, new FunctionParameter[] { }, token);
+                    }
                 }
                 while (true)
                 {
@@ -647,9 +666,9 @@ namespace Runic.C
                     {
                         return null;
                     }
-                    if (Function != null && parameterIndex < Function.FunctionParameters.Length && Function.FunctionParameters[parameterIndex].Type is Type.StructOrUnion)
+                    if (Function != null && parameterIndex < functionParameters.Length && functionParameters[parameterIndex].Type is Type.StructOrUnion)
                     {
-                        Type.StructOrUnion structType = Function.FunctionParameters[parameterIndex].Type as Type.StructOrUnion;
+                        Type.StructOrUnion structType = functionParameters[parameterIndex].Type as Type.StructOrUnion;
                         if (structType != null)
                         {
                             /* That is a Runic C Specific extension most C Compiler want a cast */
@@ -658,14 +677,22 @@ namespace Runic.C
                                 case CompoundLiteralsFields compoundLiteralsFields:
                                     if (!Context.AllowCompoundLiteralsPassedToFunctionWithoutCast)
                                     {
-                                        Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(token, Function);
+                                        switch (Function)
+                                        {
+                                            case Function func: Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(func, token); break;
+                                            case Expression func: Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(func, token); break;
+                                        }
                                     }
                                     parameters.Add(CompoundLiteralsStruct.Create(Context, compoundLiteralsFields, structType));
                                     break;
                                 case CompoundLiteralsList compoundLiteralsList:
                                     if (!Context.AllowCompoundLiteralsPassedToFunctionWithoutCast)
                                     {
-                                        Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(token, Function);
+                                        switch (Function)
+                                        {
+                                            case Function func: Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(func, token); break;
+                                            case Expression func: Context.Error_CompoundLiteralsPassedToFunctionWithoutCast(func, token); break;
+                                        }
                                     }
                                     parameters.Add(CompoundLiteralsStruct.Create(Context, compoundLiteralsList, structType)); break;
                                 default: parameters.Add(parameter); break;
@@ -697,14 +724,23 @@ namespace Runic.C
                         break;
                     }
 
-                    Context.Error_InvalidFunctionCall(Function, token);
+                    switch (Function)
+                    {
+                        case Function func: Context.Error_InvalidFunctionCall(func, token); break;
+                        case Expression func: Context.Error_InvalidFunctionCall(func, token); break;
+                    }
                     while (token != null && token.Value != ")" && token.Value != ";" && token.Value != "}" && token.Value != "{")
                     {
                         token = TokenQueue.ReadNextToken();
                     }
                     break;
                 }
-                return new Call(Function, leftParenthesis, parameters.ToArray(), rightParenthesis);
+                switch (Function)
+                {
+                    case Function func: return new Call(func, leftParenthesis, parameters.ToArray(), rightParenthesis);
+                    case Expression func: return new IndirectCall(func, leftParenthesis, parameters.ToArray(), rightParenthesis);
+                }
+                return null;
             }
             static Expression.Constant ParseStringConstant(Parser Context, Token firstToken, TokenQueue tokenQueue)
             {
@@ -762,7 +798,7 @@ namespace Runic.C
                     if (type == null) { return null; }
                     return type as Type.StructOrUnion;
                 }
-                return null;
+                return structOrUnion as Type.StructOrUnion.StructOrUnionDeclaration;
             }
 #if NET6_0_OR_GREATER
             internal static Expression? Parse(IScope ParentScope, Parser Context, TokenQueue TokenQueue, bool StopOnComma = true)
@@ -1146,8 +1182,38 @@ namespace Runic.C
 #endif
                                 if (variable != null)
                                 {
-                                    operators.Push(new Operator(token, OperatorFlag.None));
-                                    expressions.Push(new VariableUse(variable));
+                                    if ((flag & OperatorFlag.MaybeFunction) != 0)
+                                    {
+#if NET6_0_OR_GREATER
+                                        Expression? function = expressions.Pop(maybeTypeToken);
+#else
+                                        Expression function = expressions.Pop(maybeTypeToken);
+#endif
+                                        if (function == null)
+                                        {
+                                            // This should not happend
+                                            expressions.Push(new Constant(new Token[] { maybeTypeToken }));
+                                        }
+                                        else
+                                        {
+                                            TokenQueue.FrontLoadToken(maybeTypeToken);
+                                            TokenQueue.FrontLoadToken(leftParenthesis);
+                                            Expression result = ParseFunctionCall(function, ParentScope, Context, TokenQueue);
+                                            expressions.Push(result);
+#if NET6_0_OR_GREATER
+                                            Type? resultType = result.Type;
+#else
+                                            Type resultType = result.Type;
+#endif
+                                            if (resultType != null && resultType is Type.FunctionPointerType) { flag |= OperatorFlag.MaybeFunction; }
+                                            else { flag &= ~OperatorFlag.MaybeFunction; }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        operators.Push(new Operator(token, OperatorFlag.None));
+                                        expressions.Push(new VariableUse(variable));
+                                    }
                                 }
                                 else
                                 {
@@ -1549,6 +1615,7 @@ namespace Runic.C
                                     if (variable != null)
                                     {
                                         expressions.Push(new VariableUse(variable));
+                                        if (variable.Type is Type.FunctionPointerType) { flag |= OperatorFlag.MaybeFunction; }
                                     }
                                     else
                                     {

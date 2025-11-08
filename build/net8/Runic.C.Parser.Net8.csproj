@@ -42,11 +42,13 @@
     <Compile Include="..\..\src\expressions/SizeOf.cs" Link="/expressions/SizeOf.cs" />
     <Compile Include="..\..\src\expressions/Sub.cs" Link="/expressions/Sub.cs" />
     <Compile Include="..\..\src\expressions/VariableUse.cs" Link="/expressions/VariableUse.cs" />
+    <Compile Include="..\..\src\expressions/ArrayInitializer.cs" Link="/expressions/ArrayInitializer.cs" />
     <Compile Include="..\..\src\functions/Function.cs" Link="/functions/Function.cs" />
     <Compile Include="..\..\src\functions/FunctionDeclaration.cs" Link="/functions/FunctionDeclaration.cs" />
     <Compile Include="..\..\src\functions/FunctionDefinition.cs" Link="/functions/FunctionDefinition.cs" />
     <Compile Include="..\..\src\functions/Intrinsic.cs" Link="/functions/Intrinsic.cs" />
     <Compile Include="..\..\src\scopes/Break.cs" Link="/scopes/Break.cs" />
+    <Compile Include="..\..\src\scopes/Continue.cs" Link="/scopes/Continue.cs" />
     <Compile Include="..\..\src\scopes/Case.cs" Link="/scopes/Case.cs" />
     <Compile Include="..\..\src\scopes/Default.cs" Link="/scopes/Default.cs" />
     <Compile Include="..\..\src\scopes/DoWhile.cs" Link="/scopes/DoWhile.cs" />

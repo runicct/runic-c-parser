@@ -149,6 +149,9 @@
     <Compile Include="..\..\src\expressions/VariableUse.cs">
       <Link>/expressions/VariableUse.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\expressions/ArrayInitializer.cs">
+      <Link>/expressions/ArrayInitializer.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\functions/Function.cs">
       <Link>/functions/Function.cs</Link>
     </Compile>
@@ -163,6 +166,9 @@
     </Compile>
     <Compile Include="..\..\src\scopes/Break.cs">
       <Link>/scopes/Break.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\scopes/Continue.cs">
+      <Link>/scopes/Continue.cs</Link>
     </Compile>
     <Compile Include="..\..\src\scopes/Case.cs">
       <Link>/scopes/Case.cs</Link>

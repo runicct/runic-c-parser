@@ -24,6 +24,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using static Runic.C.Parser.Type.StructOrUnion;
 
 namespace Runic.C
 {
@@ -34,7 +35,7 @@ namespace Runic.C
             public class CompoundLiteralsFields : Expression
             {
                 Dictionary<string, Expression> _values;
-                public Dictionary<string, Expression> Values { get { return _values; } }
+                public IReadOnlyDictionary<string, Expression> Values { get { return _values; } }
                 Token _op;
                 public CompoundLiteralsFields(Token op, Dictionary<string, Expression> values) { _op = op; _values = values; }
                 public override string ToString()
@@ -52,7 +53,7 @@ namespace Runic.C
                     return builder.ToString();
                 }
             }
-            public class CompoundLiteralsList : Expression
+            internal class CompoundLiteralsList : Expression
             {
                 Expression[] _values;
                 public Expression[] Values { get { return _values; } }
@@ -87,6 +88,7 @@ namespace Runic.C
                 public Dictionary<Field, Expression> Values { get { return _fields; } }
                 Type.StructOrUnion _type;
                 internal override Type Type { get { return _type; } }
+                public Type.StructOrUnion StructType { get { return _type; } }
                 CompoundLiteralsList _literalsList;
                 internal CompoundLiteralsStruct(CompoundLiteralsList literalsList, Dictionary<Field, Expression> initialization, Type.StructOrUnion type)
                 {
@@ -117,7 +119,7 @@ namespace Runic.C
                         if (type == null) { return null; }
                         return type as Type.StructOrUnion;
                     }
-                    return null;
+                    return structOrUnion as Type.StructOrUnion.StructOrUnionDeclaration;
                 }
                 internal static CompoundLiteralsStruct Create(Parser context, CompoundLiteralsFields compoundLiteralsFields, Type.StructOrUnion type)
                 {
@@ -132,7 +134,7 @@ namespace Runic.C
 #endif
                     if (structOrUnionTypeDefinition == null)
                     {
-                        context.Error_UseOfIncompleteTypeInFieldAccess(compoundLiteralsList.Op, type);
+                        context.Error_UseOfIncompleteTypeInCompoundLiteral(compoundLiteralsList.Op, type);
                         return new CompoundLiteralsStruct(compoundLiteralsList, new Dictionary<Field, Expression>(), type);
                     }
                     type = structOrUnionTypeDefinition;
@@ -231,7 +233,7 @@ namespace Runic.C
                     }
                     return new CompoundLiteralsStruct(compoundLiteralsList, result, type);
                 }
-                public static CompoundLiteralsStruct Create(Parser context, CompoundLiteralsList compoundLiteralsList, Type.StructOrUnion type)
+                internal static CompoundLiteralsStruct Create(Parser context, CompoundLiteralsList compoundLiteralsList, Type.StructOrUnion type)
                 {
                     int listIndex = 0;
                     return Create(context, compoundLiteralsList, type, true, ref listIndex);

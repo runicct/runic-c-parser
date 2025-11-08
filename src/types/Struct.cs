@@ -33,7 +33,7 @@ namespace Runic.C
         {
             public abstract class StructOrUnion : Type, IScope
             {
-                class StructOrUnionDeclaration : StructOrUnion
+                internal class StructOrUnionDeclaration : StructOrUnion
                 {
                     bool _union = false;
                     Token _structToken;

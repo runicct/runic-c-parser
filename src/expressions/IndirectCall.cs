@@ -40,8 +40,22 @@ namespace Runic.C
                 public Token LeftParenthesis { get { return _leftParenthesis; } }
                 Token _rightParenthesis;
                 public Token RightParenthesis { get { return _rightParenthesis; } }
+#if NET6_0_OR_GREATER
+                Type? _type;
+                internal override Type? Type { get { return _type; } }
+#else
+                Type _type;
+                internal override Type Type { get { return _type; } }
+#endif
+
                 internal IndirectCall(Expression function, Token leftParenthesis, Expression[] parameters, Token rightParenthesis)
                 {
+#if NET6_0_OR_GREATER
+                    Type.FunctionPointerType? funcType = function.Type as Type.FunctionPointerType;
+#else
+                    Type.FunctionPointerType funcType = function.Type as Type.FunctionPointerType;
+#endif
+                    if (funcType != null) { _type = funcType.ReturnType; }
                     _function = function;
                     _parameters = parameters;
                     _leftParenthesis = leftParenthesis;

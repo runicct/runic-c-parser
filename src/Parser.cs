@@ -134,6 +134,7 @@ namespace Runic.C
         public virtual void Error_InvalidFunctionParameterType(Token FunctionName, Token Type) { }
         public virtual void Error_InvalidAssignmentTarget(Token Assignment, Expression Target) { }
         public virtual void Error_InvalidFunctionCall(Function Function, Token InvalidToken) { }
+        public virtual void Error_InvalidFunctionCall(Expression Function, Token InvalidToken) { }
         public virtual void Error_VariadicSpecifierMustEndParameterList(Token Function, Token InvalidToken) { }
         public virtual void Error_InvalidOperatorTarget(Token Operator, Expression Target) { }
         public virtual void Error_UndefinedVariable(Token Variable) { }
@@ -142,12 +143,15 @@ namespace Runic.C
         public virtual void Error_LabelUsedOutsideFunction(Token InvalidLabel) { }
         public virtual void Error_ExpectedWhile(Token Token) { }
         public virtual void Error_InvalidCast(Type Type, Token Token) { }
+        public virtual void Error_InvalidArrayInitialization(Token Array, Expression Initialization) { }
         public virtual void Error_InvalidMemberAccess(Variable Variable, Token Operator, Token FieldName) { }
         public virtual void Error_InvalidStatementOutsideOfASwitchOrLoop(Token Token) { }
         public virtual void Error_InvalidReferenceTarget(Token Reference, Expression Target) { }
         public virtual void Error_FieldInitializedMultipleTimeInCompoundLiterals(Token FieldName) { }
-        public virtual void Error_CompoundLiteralsPassedToFunctionWithoutCast(Token token, Function function) { }
+        public virtual void Error_CompoundLiteralsPassedToFunctionWithoutCast(Function function, Token token) { }
+        public virtual void Error_CompoundLiteralsPassedToFunctionWithoutCast(Expression function, Token token) { }
         public virtual void Error_UseOfIncompleteTypeInFieldAccess(Token token, Type incompleteType) { }
+        public virtual void Error_UseOfIncompleteTypeInCompoundLiteral(Token token, Type incompleteType) { }
         public virtual void Error_CaseOutsideOfSwitch(Token token) { }
 
         bool _allowCompoundLiteralsPassedToFunctionWithoutCast = false;
@@ -382,12 +386,16 @@ namespace Runic.C
                 }
 #if NET6_0_OR_GREATER
                 Token? staticArrayToken = null;
+                Expression? arraySize = null;
 #else
                 Token staticArrayToken = null;
+                Expression arraySize = null;
 #endif
+                bool isStaticArray = false;
                 bool implicitStaticArraySize = false;
                 if (token.Value == "[")
                 {
+                    isStaticArray = true;
                     staticArrayToken = token;
                     token = _input.PeekToken();
                     if (token != null && token.Value == "]")
@@ -398,9 +406,9 @@ namespace Runic.C
                     else
                     {
 #if NET6_0_OR_GREATER
-                        Expression? arraySize = Expression.Parse(_scopes.Peek(), this, _input);
+                        arraySize = Expression.Parse(_scopes.Peek(), this, _input);
 #else
-                        Expression arraySize = Expression.Parse(_scopes.Peek(), this, _input);
+                        arraySize = Expression.Parse(_scopes.Peek(), this, _input);
 #endif
                         token = _input.ReadNextToken();
                         if (token == null)
@@ -435,18 +443,36 @@ namespace Runic.C
                             Expression initialization = Expression.Parse(_scopes.Peek(), this, _input);
                             Expression.CompoundLiteralsList compountLiteralsListInit = initialization as Expression.CompoundLiteralsList;
 #endif
-                            if (compountLiteralsListInit != null)
+
+                            if (isStaticArray)
                             {
-                                if (implicitStaticArraySize)
+                                if (compountLiteralsListInit != null)
                                 {
-                                    type = type.MakeStaticArray(null, new Expression[] { new Expression.Constant(new Token[] { new ImplicitToken(staticArrayToken.StartLine, staticArrayToken.StartColumn, staticArrayToken.EndLine, staticArrayToken.EndColumn, staticArrayToken.File, compountLiteralsListInit.Values.Length.ToString()) }) });
+                                    Type.StaticArray staticArrayType;
+                                    if (implicitStaticArraySize)
+                                    {
+                                        staticArrayType = type.MakeStaticArray(null, new Expression[] { new Expression.Constant(new Token[] { new ImplicitToken(staticArrayToken.StartLine, staticArrayToken.StartColumn, staticArrayToken.EndLine, staticArrayToken.EndColumn, staticArrayToken.File, compountLiteralsListInit.Values.Length.ToString()) }) });
+                                    }
+                                    else
+                                    {
+                                        staticArrayType = type.MakeStaticArray(null, new Expression[] { arraySize });
+                                    }
+                                    type = staticArrayType;
+                                    initialization = new Expression.ArrayInitializer(compountLiteralsListInit.Op, staticArrayType, compountLiteralsListInit.Values);
                                 }
                                 else
                                 {
+                                    Error_InvalidArrayInitialization(name, initialization);
+                                }
+                            }
+                            else
+                            {
+                                if (compountLiteralsListInit != null)
+                                {
                                     initialization = Expression.CompoundLiteralsStruct.Create(this, compountLiteralsListInit, variableStructType);
                                 }
-
                             }
+
                             Variable variable;
                             if (parentFunction != null)
                             {
@@ -1191,8 +1217,11 @@ namespace Runic.C
 
                         return new Case(this, token, switchScope.Switch, constantExpression, next);
                     }
+                case "continue":
                 case "break":
                     {
+                        bool isContinue = (token.Value == "continue");
+                        bool noMoreErrors = false;
 #if NET6_0_OR_GREATER
                         Token? next = _input.ReadNextToken();
 #else
@@ -1205,7 +1234,9 @@ namespace Runic.C
                         }
                         if (next.Value != ";")
                         {
+                            Error_ExpectedSemicolumn(next);
                             ReattachToken(next);
+                            noMoreErrors = true;
                         }
 #if NET6_0_OR_GREATER
                         IScope? scope = _scopes.Peek().GetBreakContinueScope();
@@ -1214,17 +1245,20 @@ namespace Runic.C
 #endif
                         if (scope == null)
                         {
-                            Error_InvalidStatementOutsideOfASwitchOrLoop(token);
+                            if (!noMoreErrors)
+                            {
+                                Error_InvalidStatementOutsideOfASwitchOrLoop(token);
+                            }
                             return new Empty(token);
                         }
 
                         switch (scope)
                         {
-                            case Scope.ForScope forScope: return new Break.ForBreak(token, forScope.For);
-                            case Scope.UnscopedForScope forScope: return new Break.UnscopedForBreak(token, forScope.For);
-                            case Scope.WhileScope whileScope: return new Break.WhileBreak(token, whileScope.While);
-                            case Scope.DoWhileScope doWhileScope: return new Break.DoWhileBreak(token, doWhileScope.DoWhile);
-                            case Scope.SwitchScope switchScope: return new Break.SwitchBreak(token, switchScope.Switch);
+                            case Scope.ForScope forScope: if (isContinue) { return new Continue.ForContinue(token, forScope.For); } else { return new Break.ForBreak(token, forScope.For); }
+                            case Scope.UnscopedForScope forScope: if (isContinue) { return new Continue.UnscopedForContinue(token, forScope.For); } else { return new Break.UnscopedForBreak(token, forScope.For); }
+                            case Scope.WhileScope whileScope: if (isContinue) { return new Continue.WhileContinue(token, whileScope.While); } else { return new Break.WhileBreak(token, whileScope.While); }
+                            case Scope.DoWhileScope doWhileScope: if (isContinue) { return new Continue.DoWhileContinue(token, doWhileScope.DoWhile); } else { return new Break.DoWhileBreak(token, doWhileScope.DoWhile); }
+                            case Scope.SwitchScope switchScope: if (isContinue) { return new Continue.SwitchContinue(token, switchScope.Switch); } else { return new Break.SwitchBreak(token, switchScope.Switch); }
                             default: throw new Exception("Internal error: the scope should be a switch or loop");
                         }
                     }
