@@ -892,8 +892,12 @@ namespace Runic.C
                     {
 #if NET6_0_OR_GREATER
                         Token? opToken = token;
+                        Token leftBracket = token;
+                        Token? rightBracket = null;
 #else
                         Token opToken = token;
+                        Token leftBracket = token;
+                        Token rightBracket = null;
 #endif
                         flag &= ~OperatorFlag.MaybeFunction;
                         List<Expression> ordinalField = new List<Expression>();
@@ -907,7 +911,7 @@ namespace Runic.C
                             Context.Error_IncompleteExpression(lastValidToken);
                             goto done;
                         }
-                        if (fieldOrValue.Value == "}") { }
+                        if (fieldOrValue.Value == "}") { rightBracket = fieldOrValue; }
                         else if (fieldOrValue.Value == ".")
                         {
                             Dictionary<string, Expression> fields = new Dictionary<string, Expression>();
@@ -950,7 +954,7 @@ namespace Runic.C
                                     Context.Error_ExpectedAssignment(assignmentOperator);
                                     while (assignmentOperator != null)
                                     {
-                                        if (assignmentOperator.Value == "}") { goto endOfCompoundLiteralsParsing; }
+                                        if (assignmentOperator.Value == "}") { rightBracket = fieldOrValue; goto endOfCompoundLiteralsParsing; }
                                         if (assignmentOperator.Value == ";") { goto endOfCompoundLiteralsParsing; }
                                         if (assignmentOperator.Value == ",") { goto nextField; }
                                         if (assignmentOperator.Value == "=") { break; }
@@ -980,7 +984,11 @@ namespace Runic.C
                                     Context.Error_IncompleteExpression(fieldOrValue);
                                     goto done;
                                 }
-                                if (endOrComma.Value == "}") { break; }
+                                if (endOrComma.Value == "}") 
+                                {
+                                    rightBracket = endOrComma;
+                                    break;
+                                }
                                 if (endOrComma.Value == ";")
                                 {
                                     Context.Error_ExpectedComma(endOrComma);
@@ -1016,6 +1024,7 @@ namespace Runic.C
 
                                 if (nextFieldPeriod.Value == "}")
                                 {
+                                    rightBracket = nextFieldPeriod;
                                     Context.Error_ExpectedIdentifier(lastValidToken);
                                     break;
                                 }
@@ -1075,7 +1084,7 @@ namespace Runic.C
                                         if (skipUntilAssignment == null) { goto done; }
                                         if (skipUntilAssignment.Value == "=") { break; }
                                         if (skipUntilAssignment.Value == ",") { goto nextValue; }
-                                        if (skipUntilAssignment.Value == "}") { goto endOfCompoundLiteralsParsing; }
+                                        if (skipUntilAssignment.Value == "}") { rightBracket = skipUntilAssignment; goto endOfCompoundLiteralsParsing; }
                                         if (skipUntilAssignment.Value == ";") { goto endOfCompoundLiteralsParsing; }
                                     }
                                     // Ignore the expression
@@ -1099,7 +1108,7 @@ namespace Runic.C
                                     Context.Error_IncompleteExpression(lastValidToken);
                                     goto done;
                                 }
-                                if (endOrComma.Value == "}") { break; }
+                                if (endOrComma.Value == "}") { rightBracket = endOrComma; break; }
                                 if (endOrComma.Value == ";")
                                 {
                                     Context.Error_ExpectedComma(endOrComma);
@@ -1118,13 +1127,14 @@ namespace Runic.C
                                         endOrComma = TokenQueue.ReadNextToken();
                                         if (endOrComma == null) { goto endOfCompoundLiteralsParsing; }
                                         if (endOrComma.Value == ",") { break; }
-                                        if (endOrComma.Value == "}" || endOrComma.Value == ";") { goto endOfCompoundLiteralsParsing; }
+                                        if (endOrComma.Value == "}") { rightBracket = endOrComma; goto endOfCompoundLiteralsParsing; }
+                                        if (endOrComma.Value == ";") { goto endOfCompoundLiteralsParsing; }
                                     }
                                 }
                                 usedCommaBefore = true;
                             }
                             endOfCompoundLiteralsParsing:;
-                            expressions.Push(new CompoundLiteralsList(opToken, fields.ToArray()));
+                            expressions.Push(new CompoundLiteralsList(leftBracket, fields.ToArray(), rightBracket));
                         }
                     }
                     else if (token.Value == "[")

@@ -57,17 +57,19 @@ namespace Runic.C
             {
                 Expression[] _values;
                 public Expression[] Values { get { return _values; } }
+                Token _leftBracket;
+                internal Token LeftBracket { get { return _leftBracket; } }
 #if NET6_0_OR_GREATER
-                Token? _op;
-                internal Token? Op { get { return _op; } }
+                Token? _rightBracket;
+                internal Token? RightBracket { get { return _rightBracket; } }
 #else
-                Token _op;
-                internal Token Op { get { return _op; } }
+                Token _rightBracket;
+                internal Token RightBracket { get { return _rightBracket; } }
 #endif
 #if NET6_0_OR_GREATER
-                public CompoundLiteralsList(Token? op, Expression[] values) { _op = op; _values = values; }
+                public CompoundLiteralsList(Token leftBracket, Expression[] values, Token? rightBracket) { _leftBracket = leftBracket; _values = values; _rightBracket = rightBracket; }
 #else
-                public CompoundLiteralsList(Token op, Expression[] values) { _op = op; _values = values; }
+                public CompoundLiteralsList(Token leftBracket, Expression[] values, Token rightBracket) { _leftBracket = leftBracket; _values = values;  _rightBracket = rightBracket;}
 #endif
                 public override string ToString()
                 {
@@ -90,6 +92,12 @@ namespace Runic.C
                 internal override Type Type { get { return _type; } }
                 public Type.StructOrUnion StructType { get { return _type; } }
                 CompoundLiteralsList _literalsList;
+                public Token LeftBracket { get { return _literalsList.LeftBracket; } }
+#if NET6_0_OR_GREATER
+                public Token? RightBracket { get { return _literalsList.RightBracket; } }
+#else
+                public Token RightBracket { get { return _literalsList.RightBracket; } }
+#endif
                 internal CompoundLiteralsStruct(CompoundLiteralsList literalsList, Dictionary<Field, Expression> initialization, Type.StructOrUnion type)
                 {
                     _literalsList = literalsList;
@@ -134,7 +142,7 @@ namespace Runic.C
 #endif
                     if (structOrUnionTypeDefinition == null)
                     {
-                        context.Error_UseOfIncompleteTypeInCompoundLiteral(compoundLiteralsList.Op, type);
+                        context.Error_UseOfIncompleteTypeInCompoundLiteral(compoundLiteralsList.LeftBracket, type);
                         return new CompoundLiteralsStruct(compoundLiteralsList, new Dictionary<Field, Expression>(), type);
                     }
                     type = structOrUnionTypeDefinition;

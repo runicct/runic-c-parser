@@ -32,26 +32,32 @@ namespace Runic.C
             {
                 Expression[] _values;
                 public Expression[] Values { get { return _values; } }
-                Token _operator;
-                public Token Operator { get { return _operator; } }
+                Token _leftBracket;
+                public Token LeftBracket { get { return _leftBracket; } }
 #if NET6_0_OR_GREATER
+                Token? _rightBracket;
+                public Token? RightBracket { get { return _rightBracket; } }
                 Type.StaticArray? _type;
                 internal override Type? Type { get { return _type; } }
                 public Type.StaticArray? ArrayType { get { return _type; } }
 #else
+                Token _rightBracket;
+                public Token RightBracket { get { return _rightBracket; } }
                 Type.StaticArray _type;
                 internal override Type Type { get { return _type; } }
                 public Type.StaticArray ArrayType { get { return _type; } }
 #endif
 
 #if NET6_0_OR_GREATER
-                internal ArrayInitializer(Token op, Type.StaticArray? type, Expression[] values)
+                internal ArrayInitializer(Type.StaticArray? type, Token leftBracket, Expression[] values, Token? rightBracket)
 #else
-                internal ArrayInitializer(Token op, Type.StaticArray type, Expression[] values)
+                internal ArrayInitializer(Type.StaticArray type, Token leftBracket, Expression[] values, Token rightBracket)
 #endif
                 {
                     _type = type;
                     _values = values;
+                    _leftBracket = leftBracket;
+                    _rightBracket = rightBracket;
                 }
             }
         }

@@ -458,7 +458,7 @@ namespace Runic.C
                                         staticArrayType = type.MakeStaticArray(null, new Expression[] { arraySize });
                                     }
                                     type = staticArrayType;
-                                    initialization = new Expression.ArrayInitializer(compountLiteralsListInit.Op, staticArrayType, compountLiteralsListInit.Values);
+                                    initialization = new Expression.ArrayInitializer(staticArrayType, compountLiteralsListInit.LeftBracket, compountLiteralsListInit.Values, compountLiteralsListInit.RightBracket);
                                 }
                                 else
                                 {
@@ -1303,6 +1303,26 @@ namespace Runic.C
                     if (token.Value == ";")
                     {
                         return new Empty(token);
+                    }
+                    if (token.Value == "*")
+                    {
+                        _input.FrontLoadToken(token);
+#if NET6_0_OR_GREATER
+                        Expression? expression = Expression.Parse(_scopes.Peek(), this, _input, false);
+#else
+                        Expression expression = Expression.Parse(_scopes.Peek(), this, _input, false);
+#endif
+                        token = _input.ReadNextToken();
+                        if (token == null)
+                        {
+                            Error_ExpectedSemicolumn(firstToken);
+                        }
+                        else if (token.Value != ";")
+                        {
+                            while (!ReattachToken(token)) { token = _input.ReadNextToken(); }
+                            Error_ExpectedSemicolumn(firstToken);
+                        }
+                        return expression;
                     }
                     if (Identifier.IsValid(token, _standardRevision) && (_scopes.Peek().ResolveType(token.Value) == null))
                     {
