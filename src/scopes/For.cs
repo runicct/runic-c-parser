@@ -96,7 +96,7 @@ namespace Runic.C
 
                 if (token.Value != "(")
                 {
-                    Context.Error_InvalidIfStatement(ForToken, token);
+                    Context.Error_InvalidForStatement(ForToken, token);
                     // Look up to '('
                     return null;
                 }
@@ -227,37 +227,51 @@ namespace Runic.C
                 }
                 condition:;
                 forLoop._variablesDeclarations = variables.ToArray();
-                forLoop._condition = Expression.Parse(forLoop.Body, Context, TokenQueue);
-                token = TokenQueue.ReadNextToken();
-                if (token == null )
+                token = TokenQueue.PeekToken();
+                if (token == null) 
                 {
                     Context.Error_IncompleteStatement(ForToken);
                     return null;
                 }
-
                 if (token.Value != ";")
                 {
-                    if (forLoop._condition != null)
+                    forLoop._condition = Expression.Parse(forLoop.Body, Context, TokenQueue);
+                    token = TokenQueue.ReadNextToken();
+                    if (token == null)
                     {
-                        // No need to overwheelm the users with two errors so only report it if we have extra token
-                        Context.Error_ExpectedSemicolumn(token);
+                        Context.Error_IncompleteStatement(ForToken);
+                        return null;
                     }
-                    while (token != null && token.Value != ";")
+
+                    if (token.Value != ";")
                     {
-                        token = TokenQueue.ReadNextToken();
-                        if (token == null) { return null; }
-                        if (token.Value == "{")
+                        if (forLoop._condition != null)
                         {
-                            return forLoop;
+                            // No need to overwheelm the users with two errors so only report it if we have extra token
+                            Context.Error_ExpectedSemicolumn(token);
                         }
-                        if (token.Value == "}")
+                        while (token != null && token.Value != ";")
                         {
-                            return null;
+                            token = TokenQueue.ReadNextToken();
+                            if (token == null) { return null; }
+                            if (token.Value == "{")
+                            {
+                                return forLoop;
+                            }
+                            if (token.Value == "}")
+                            {
+                                return null;
+                            }
                         }
                     }
                 }
-                forLoop._increment = Expression.Parse(forLoop.Body, Context, TokenQueue, false);
-                token = TokenQueue.ReadNextToken();
+                else
+                {
+                    forLoop._condition = null;
+                    TokenQueue.ReadNextToken(); // consume the ';'
+                }
+
+                token = TokenQueue.PeekToken();
                 if (token == null)
                 {
                     Context.Error_IncompleteStatement(ForToken);
@@ -265,24 +279,41 @@ namespace Runic.C
                 }
                 if (token.Value != ")")
                 {
-                    if (forLoop._increment != null)
+                    forLoop._increment = Expression.Parse(forLoop.Body, Context, TokenQueue, false);
+                    token = TokenQueue.ReadNextToken();
+                    if (token == null)
                     {
-                        // No need to overwhelm the users with two errors so only report it if we have extra token
+                        Context.Error_IncompleteStatement(ForToken);
+                        return null;
                     }
-                    while (token != null && token.Value != ")")
+
+                    if (token.Value != ")")
                     {
-                        token = TokenQueue.ReadNextToken();
-                        if (token == null) { return null; }
-                        if (token.Value == "{")
+                        if (forLoop._increment != null)
                         {
-                            return forLoop;
+                            // No need to overwhelm the users with two errors so only report it if we have extra token
                         }
-                        if (token.Value == "}")
+                        while (token != null && token.Value != ")")
                         {
-                            return null;
+                            token = TokenQueue.ReadNextToken();
+                            if (token == null) { return null; }
+                            if (token.Value == "{")
+                            {
+                                return forLoop;
+                            }
+                            if (token.Value == "}")
+                            {
+                                return null;
+                            }
                         }
                     }
                 }
+                else
+                {
+                    forLoop._increment = null;
+                    TokenQueue.ReadNextToken(); // consume the ')'
+                }
+               
                 return forLoop;
             }
         }

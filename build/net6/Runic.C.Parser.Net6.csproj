@@ -64,6 +64,7 @@
     <Compile Include="..\..\src\statements/Empty.cs" Link="/statements/Empty.cs" />
     <Compile Include="..\..\src\statements/EmptyWhile.cs" Link="/statements/EmptyWhile.cs" />
     <Compile Include="..\..\src\statements/Return.cs" Link="/statements/Return.cs" />
+    <Compile Include="..\..\src\statements/Goto.cs" Link="/statements/Goto.cs" />
     <Compile Include="..\..\src\statements/Typedef.cs" Link="/statements/Typedef.cs" />
     <Compile Include="..\..\src\statements/UnscopedDo.cs" Link="/statements/UnscopedDo.cs" />
     <Compile Include="..\..\src\statements/UnscopedElse.cs" Link="/statements/UnscopedElse.cs" />

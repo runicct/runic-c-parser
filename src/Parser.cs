@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Runic.C
 {
@@ -113,6 +114,7 @@ namespace Runic.C
         public virtual void Error_InvalidType(Token Token) { }
         public virtual void Error_InvalidEnumValue(Token Enum, Token Token) { }
         public virtual void Error_InvalidIfStatement(Token If, Token InvalidToken) { }
+        public virtual void Error_InvalidForStatement(Token For, Token InvalidToken) { }
         public virtual void Error_InvalidFunctionPointerDeclaration(Token Token) { }
         public virtual void Error_InvalidIdentifier(Token Token) { }
         public virtual void Error_ExtraTokenAfterFieldDeclation(Token FieldName, Token ExtraToken) { }
@@ -153,6 +155,7 @@ namespace Runic.C
         public virtual void Error_UseOfIncompleteTypeInFieldAccess(Token token, Type incompleteType) { }
         public virtual void Error_UseOfIncompleteTypeInCompoundLiteral(Token token, Type incompleteType) { }
         public virtual void Error_CaseOutsideOfSwitch(Token token) { }
+        public virtual void Error_GotoOutsideFunction(Token token) { }
 
         bool _allowCompoundLiteralsPassedToFunctionWithoutCast = false;
         public bool AllowCompoundLiteralsPassedToFunctionWithoutCast
@@ -1289,6 +1292,52 @@ namespace Runic.C
                             return null;
                         }
                         return new Default(this, token, switchScope.Switch, next);
+                    }
+                case "goto":
+                    {
+#if NET6_0_OR_GREATER
+                        Token? next = _input.ReadNextToken();
+#else
+                        Token next = _input.ReadNextToken();
+#endif
+                        if (next == null)
+                        {
+                            Error_IncompleteStatement(token);
+                            return null;
+                        }
+                        Token labelName = next;
+                        next = _input.ReadNextToken();
+                        if (next == null)
+                        {
+                            Error_IncompleteStatement(token);
+                            return new Goto(_scopes.Peek(), this, token, null);
+                        }
+                        Token separator = next;
+
+#if NET6_0_OR_GREATER     
+                        Function? function = _scopes.Peek().GetParentFunction();
+#else
+                        Function function = _scopes.Peek().GetParentFunction();
+#endif
+                        if (function == null)
+                        {
+                            Error_GotoOutsideFunction(token);
+                            if (separator.Value != ";") { ReattachToken(next); }
+                            return new Goto(_scopes.Peek(), this, token, null);
+                        }
+                        else
+                        {
+                            Label label = null;
+                            label = function.GetOrDeclareLabel(labelName);
+
+                            if (separator.Value != ";")
+                            {
+                                Error_ExpectedSemicolumn(next);
+                                ReattachToken(next);
+                            }
+
+                            return new Goto(_scopes.Peek(), this, token, label);
+                        }
                     }
                 default:
                     _input.FrontLoadToken(token);

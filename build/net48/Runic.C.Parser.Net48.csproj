@@ -215,6 +215,9 @@
     <Compile Include="..\..\src\statements/Return.cs">
       <Link>/statements/Return.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\statements/Goto.cs">
+      <Link>/statements/Goto.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\statements/Typedef.cs">
       <Link>/statements/Typedef.cs</Link>
     </Compile>
