@@ -156,6 +156,7 @@ namespace Runic.C
         public virtual void Error_UseOfIncompleteTypeInCompoundLiteral(Token token, Type incompleteType) { }
         public virtual void Error_CaseOutsideOfSwitch(Token token) { }
         public virtual void Error_GotoOutsideFunction(Token token) { }
+        public virtual void Error_InvalidLabelName(Token token) { }
 
         bool _allowCompoundLiteralsPassedToFunctionWithoutCast = false;
         public bool AllowCompoundLiteralsPassedToFunctionWithoutCast
@@ -1383,6 +1384,7 @@ namespace Runic.C
                         if (maybeLabel != null && maybeLabel.Value == ":")
                         {
                             _input.ReadNextToken();
+                            if (!Identifier.IsValid(token, _standardRevision)) { Error_InvalidLabelName(token); }
 #if NET6_0_OR_GREATER
                             Function? function = _scopes.Peek().GetParentFunction();
 #else
@@ -1390,11 +1392,11 @@ namespace Runic.C
 #endif
                             if (function == null)
                             {
-                                Error_LabelUsedOutsideFunction(maybeLabel);
+                                Error_LabelUsedOutsideFunction(token);
                             }
                             else
                             {
-                                return function.GetOrDeclareLabel(maybeLabel);
+                                return function.GetOrDeclareLabel(token);
                             }
                         }
                         _input.FrontLoadToken(token);
